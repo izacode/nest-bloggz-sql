@@ -23,11 +23,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
+      host: 'ec2-3-93-206-109.compute-1.amazonaws.com',
       port: 5432,
       username: 'postgres',
       password: 'farce',
       database: 'Blog',
+      url: process.env.DATABASE_URL,
       autoLoadEntities: false,
       synchronize: false,
     }),
@@ -36,7 +37,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     PostsModule,
     CommentsModule,
     UsersModule,
-    // TestingClearModule,
+    TestingClearModule,
     // MongooseModule.forRoot(
     //   `mongodb+srv://thug:${process.env.MONGO_PASSWORD}@clusterblogg.gub0i.mongodb.net`,
     // ),
