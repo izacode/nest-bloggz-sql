@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { CustomResponseType } from '../types';
 
-import { BloggersRepository } from './bloggers.repository';
+
 import { CreateBloggerDto } from './dto/create-blogger.dto';
 import { FilterDto } from '../dto/filter.dto';
 import { UpdateBloggerDto } from './dto/update-blogger.dto';
