@@ -23,7 +23,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'ec2-3-93-206-109.compute-1.amazonaws.com',
+      host: 'ec2-52-200-5-135.compute-1.amazonaws.com',
       port: 5432,
       username: 'zyufqgjelilcdl',
       // username: 'postgres',
