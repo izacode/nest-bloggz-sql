@@ -28,14 +28,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       url: process.env.DATABASE_URL,
       autoLoadEntities: false,
       synchronize: false,
-      // ssl: true,
+     
     }),
     AuthModule,
     BloggersModule,
     PostsModule,
     CommentsModule,
     UsersModule,
-    // TestingClearModule,
+    TestingClearModule,
     // MongooseModule.forRoot(
     //   `mongodb+srv://thug:${process.env.MONGO_PASSWORD}@clusterblogg.gub0i.mongodb.net`,
     // ),
