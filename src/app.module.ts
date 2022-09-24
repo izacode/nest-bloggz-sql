@@ -28,6 +28,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       url: process.env.DATABASE_URL,
       autoLoadEntities: false,
       synchronize: false,
+      ssl: {
+        rejectUnauthorized: false
+      }
     }),
     AuthModule,
     BloggersModule,
