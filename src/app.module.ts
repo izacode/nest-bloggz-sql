@@ -14,8 +14,6 @@ import { BloggersController } from './bloggers/bloggers.controller';
 import { WalletsModule } from './wallets/wallets.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-
-
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -30,6 +28,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       url: process.env.DATABASE_URL,
       autoLoadEntities: false,
       synchronize: false,
+      ssl: true,
     }),
     AuthModule,
     BloggersModule,
