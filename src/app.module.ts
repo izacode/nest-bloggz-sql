@@ -21,14 +21,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'ec2-52-200-5-135.compute-1.amazonaws.com',
+      host: 'ec2-44-207-253-50.compute-1.amazonaws.com',
       port: 5432,
       // username: 'postgres',
       // database: 'Blog',
       url: process.env.DATABASE_URL,
       autoLoadEntities: false,
       synchronize: false,
-     
     }),
     AuthModule,
     BloggersModule,
