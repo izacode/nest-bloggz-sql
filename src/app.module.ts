@@ -39,7 +39,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     PostsModule,
     CommentsModule,
     UsersModule,
-    TestingClearModule,
+    // TestingClearModule,
     // MongooseModule.forRoot(
     //   `mongodb+srv://thug:${process.env.MONGO_PASSWORD}@clusterblogg.gub0i.mongodb.net`,
     // ),
