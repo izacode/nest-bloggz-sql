@@ -62,12 +62,13 @@ export class PostsController {
     return;
   }
 
-  @UseGuards(BasicAuthGuard)
+  // @UseGuards(BasicAuthGuard)
   @Delete('/:id')
   @HttpCode(204)
   async deletePost(@Param('id') id: string) {
-    const isDeleted = await this.postsService.deletePost(id);
-    return;
+  
+    return this.postsService.deletePost(id);
+    
   }
 
   @Get('/:id/comments')
@@ -111,6 +112,7 @@ export class PostsController {
     @Body() likeStatusDto: LikeStatusDto,
     @CurrentUserData() currentUserData: any,
   ) {
+    
     await this.postsService.reactOnPost(id, likeStatusDto, currentUserData);
     return;
   }

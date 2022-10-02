@@ -29,6 +29,7 @@ export class CommentsRawSqlRepository {
       dislikesCount,
       myStatus,
     } = comment;
+    
     const mappedComment = {
       id,
       content,

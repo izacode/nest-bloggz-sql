@@ -63,6 +63,7 @@ export class AuthController {
 
     // IIFE solution
     // let payload = (({ sub, username }) => ({ sub, username }))(currentUserData);
+ 
 
     const accessToken = await this.authService.createToken(
       payload,

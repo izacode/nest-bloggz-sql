@@ -13,6 +13,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { ReactionsRawSqlRepository } from '../likes/reactions.raw-sql-repository';
 
+
 @Injectable()
 export class PostsRawSqlRepository {
   constructor(
@@ -63,94 +64,100 @@ export class PostsRawSqlRepository {
 
     let posts: Post[] = await this.dataSource.query(
       `
-         SELECT *
-         FROM posts
-         WHERE title LIKE ('%'||$1||'%') or bloggerId LIKE ('%'||$1||'%')
-         LIMIT $2 OFFSET $3
+     SELECT *
+     FROM public."Posts"
+     WHERE title LIKE ('%'||$1||'%') or "bloggerId" LIKE ('%'||$1||'%')
+     LIMIT $2 OFFSET $3
       `,
       [SearchNameTerm, PageSize, offset],
     );
-    let mappedPosts: Post[];
-    if (!userInfo && posts.length !== 0) {
-      posts.forEach(async (p) => {
-        const lastThreePostLikeReactions =
-          await this.reactionsRawSqlRepository.getLastThreePostLikeReactions(
-            p.id,
-          );
-        let mappedPost = this.postMapper(p);
-        mappedPost.extendedLikesInfo.newestLikes = lastThreePostLikeReactions;
-        mappedPosts.push(mappedPost as any);
-      });
-    } else {
-      const userPostReactions =
-        await this.reactionsRawSqlRepository.getUserAllPostsReactions(
-          userInfo.sub,
-        );
-      posts.forEach(async (p) => {
-        let mappedPost = this.postMapper(p);
-        mappedPosts.push(mappedPost as any);
-      });
-      mappedPosts.map(async (p) => {
-        userPostReactions.forEach((r) => {
-          if (r.postId === p.id) {
-            p.extendedLikesInfo.myStatus = r.likeStatus;
-          }
+    let mappedPosts = [];
+    if (posts.length !== 0) {
+      if (!userInfo) {
+        posts.map(async (p) => {
+          const lastThreePostLikeReactions =
+            await this.reactionsRawSqlRepository.getLastThreePostLikeReactions(
+              p.id,
+            );
+          let mappedPost = this.postMapper(p);
+          mappedPost.extendedLikesInfo.newestLikes = lastThreePostLikeReactions;
+          mappedPosts.push(mappedPost as any);
         });
-        const lastThreePostLikeReactions =
-          await this.reactionsRawSqlRepository.getLastThreePostLikeReactions(
-            p.id,
+      } else {
+        const userPostReactions =
+          await this.reactionsRawSqlRepository.getUserAllPostsReactions(
+            userInfo.sub,
           );
-        p.extendedLikesInfo.newestLikes = lastThreePostLikeReactions;
-        return p;
-      });
+        posts.forEach(async (p) => {
+          let mappedPost = this.postMapper(p);
+          mappedPosts.push(mappedPost as any);
+        });
+        mappedPosts.map(async (p) => {
+          userPostReactions.forEach((r) => {
+            if (r.postId === p.id) {
+              p.extendedLikesInfo.myStatus = r.likeStatus;
+            }
+          });
+          const lastThreePostLikeReactions =
+            await this.reactionsRawSqlRepository.getLastThreePostLikeReactions(
+              p.id,
+            );
+          p.extendedLikesInfo.newestLikes = lastThreePostLikeReactions;
+          return p;
+        });
+      }
     }
-
     //  =====================================================================================================
 
     const totalCount: number = +(
       await this.dataSource.query(`
       SELECT Count(*)
-	    FROM public.Posts`)
+	    FROM public."Posts"`)
     )[0].count;
     const customResponse = {
       pagesCount: Math.ceil(totalCount / +PageSize),
       page: +PageNumber,
       pageSize: +PageSize,
       totalCount,
-      items: posts,
+      items: mappedPosts,
     };
 
     return customResponse;
   }
 
-  async createPost(newPost: CreatePostDto): Promise<Post | null> {
-    const { id, title, shortDescription, content, bloggerId } = newPost;
+  async createPost(newPost: Post): Promise<Post | null> {
+    const { id, title, shortDescription, content, bloggerId, addedAt } =
+      newPost;
     await this.dataSource.query(
       `
    INSERT INTO public."Posts"( 
 	 id, title, "shortDescription", content, "bloggerId", "createdAt", "likesCount", "dislikesCount", "myStatus")
 	 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);
    `,
-      [id, title, shortDescription, content, bloggerId, 0, 0, 0],
+      [id, title, shortDescription, content, bloggerId, addedAt, 0, 0, 'None'],
     );
     return newPost as Post;
   }
 
   async getPost(id: string, userInfo?: any): Promise<Post> {
+   
+
     let post = await this.dataSource.query(
       `
-    SELECT p.*, b.bloggerName 
+    SELECT p.*, b.name 
     FROM "Posts" as p
-    WHERE id = $1
-    JOIN "Bloggers" as b 
-    ON p.bloggerId = b.id 
+    JOIN bloggers as b ON p."bloggerId" = b.id 
+    LEFT JOIN public."PostsReacitons" as pr ON pr."postId" = $1 AND pr."userId" = $2 
+    WHERE p.id = $1
     `,
-      [id],
+      [id, userInfo?.sub],
     );
+ 
+    console.log(post);
 
-    if (!post) throw new NotFoundException();
+    if (post.length === 0) throw new NotFoundException();
 
-    let mappedPost = this.postMapper(post);
+    let mappedPost = this.postMapper(post[0]);
 
     let userPostReaction: PostReaction;
 
@@ -249,8 +256,6 @@ export class PostsRawSqlRepository {
       `,
           [post.id],
         );
-      
-      
     } else if (likeStatus === 'Dislike') {
       if (currentUserPostReaction.likeStatus === 'Dislike') return;
       await this.dataSource.query(
@@ -271,28 +276,26 @@ export class PostsRawSqlRepository {
       `,
           [post.id],
         );
-      
-      
     } else {
       if (currentUserPostReaction.likeStatus === 'Dislike')
-         await this.dataSource.query(
-           `
+        await this.dataSource.query(
+          `
       UPDATE "Posts"
       SET 'dislikesCount' -=1
       WHERE id = $1
       `,
-           [post.id],
-         );
+          [post.id],
+        );
 
       if (currentUserPostReaction.likeStatus === 'Like')
-         await this.dataSource.query(
-           `
+        await this.dataSource.query(
+          `
       UPDATE "Posts"
       SET 'likesCount' -=1
       WHERE id = $1
       `,
-           [post.id],
-         );
+          [post.id],
+        );
     }
     // Update PostReaction likeStatus
     await this.dataSource.query(
@@ -306,7 +309,7 @@ export class PostsRawSqlRepository {
         currentUserPostReaction.userId,
         currentUserPostReaction.postId,
       ],
-    )
-    return
+    );
+    return;
   }
 }

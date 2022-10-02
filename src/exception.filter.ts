@@ -43,7 +43,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
           field: 'code',
         });
       } else {
-        debugger;
+      
         responseBody.message.forEach((m) => {
           let isFieldExists = errorResponse.errors.find(
             (mes) => mes.field === m.field,

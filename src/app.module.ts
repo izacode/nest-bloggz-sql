@@ -1,7 +1,8 @@
+import { ConfigModule } from '@nestjs/config';
 import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
-import { ConfigModule } from '@nestjs/config';
+
 import { BloggersModule } from './bloggers/bloggers.module';
 import { PostsModule } from './posts/posts.module';
 import { CommentsModule } from './comments/comments.module';
@@ -21,17 +22,26 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'ec2-44-207-253-50.compute-1.amazonaws.com',
       port: 5432,
-      // username: 'postgres',
-      // database: 'Blog',
-      url: process.env.DATABASE_URL,
+      username: 'postgres',
+      password: 'farce',
+      database: 'Blog',
       autoLoadEntities: false,
       synchronize: false,
-      ssl: {
-        rejectUnauthorized: false
-      }
     }),
+    // TypeOrmModule.forRoot({
+    //   type: 'postgres',
+    //   host: 'ec2-44-207-253-50.compute-1.amazonaws.com',
+    //   port: 5432,
+    //   // username: 'postgres',
+    //   // database: 'Blog',
+    //   url: process.env.DATABASE_URL,
+    //   autoLoadEntities: true,
+    //   synchronize: false,
+    //   ssl: {
+    //     rejectUnauthorized: false,
+    //   },
+    // }),
     AuthModule,
     BloggersModule,
     PostsModule,

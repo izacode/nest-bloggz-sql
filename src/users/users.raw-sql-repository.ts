@@ -81,7 +81,7 @@ export class UsersRawSqlRepository {
   async createUser(user: any): Promise<any> {
     const {
       accountData: { email, userName, passwordHash, createdAt },
-      emailCOnfirmation: { isConfirmed, confirmaitonCode, expirationDate },
+      emailConfirmation: { isConfirmed, confirmationCode, expirationDate },
     } = user;
     await this.dataSource.query(
       `
@@ -95,14 +95,14 @@ export class UsersRawSqlRepository {
         passwordHash,
         createdAt,
         isConfirmed,
-        confirmaitonCode,
+        confirmationCode,
         expirationDate,
       ],
     );
-    
+
+    const createdUser = await this.findUserByEmail(email);
     // add _id to returned user
-    const userId = await this.findUserByEmail(email)
-    user._id = userId
+    user._id = createdUser._id;
     // ========================
 
     return user;
@@ -111,14 +111,26 @@ export class UsersRawSqlRepository {
   async findUserByLogin(login: string): Promise<User | null> {
     const user = await this.dataSource.query(
       `
-    SELECT "passwordHash"
+    SELECT "passwordHash", "userName", id , email
     FROM "Users"
     WHERE "userName" = $1
     `,
       [login],
     );
-    if (!user) return null;
-    return user;
+    if (user.length === 0) return null;
+    const {id, email, userName, passwordHash} = user[0]
+   
+    const dataToReturn = {
+      _id: id,
+      accountData: {
+        email,
+        userName,
+        passwordHash,
+
+      },
+    };
+
+    return dataToReturn as User;
   }
 
   async findUserByEmail(email: string): Promise<User> {
@@ -130,11 +142,13 @@ export class UsersRawSqlRepository {
     `,
       [email],
     );
-    if (!user) return null;
-    return user;
+    if (user.length === 0) return null;
+  
+    return user[0];
   }
 
   async getUserById(id): Promise<User | null> {
+   
     let user = await this.dataSource.query(
       `
     SELECT id, "userName", email
@@ -143,15 +157,17 @@ export class UsersRawSqlRepository {
     `,
       [id],
     );
-    if (!user) throw new NotFoundException();
-    user = {
-      _id: user.id,
+    if (user.length === 0) throw new NotFoundException();
+    const {userName, email} = user[0]   
+
+    const userToReturn = {
+      _id: user[0].id,
       accountData: {
-        userName: user.userName,
-        email: user.email,
+        userName,
+        email,
       },
-    };
-    return user;
+    }
+    return userToReturn as User;
   }
 
   async findUserByConfirmationCode(code: string): Promise<User | null> {
@@ -163,14 +179,15 @@ export class UsersRawSqlRepository {
     `,
       [code],
     );
-    if (!user) throw new NotFoundException();
-    user = {
-      _id: user.id,
+    let userToReturn;
+    if (user.length === 0) throw new NotFoundException();
+    userToReturn = {
+      _id: user[0].id,
       emailConfirmation: {
-        expirationDate: user.expirationDate,
+        expirationDate: user[0].expirationDate,
       },
     };
-    return user;
+    return userToReturn;
   }
 
   async updateConfirmationStatus(_id: string): Promise<boolean> {
@@ -216,11 +233,14 @@ export class UsersRawSqlRepository {
       console.log(error.message);
     }
 
-     await this.dataSource.query(`
+    await this.dataSource.query(
+      `
      DELETE FROM public."Users"
 	   WHERE id = $1;
-     `, [id]);
-    return true
+     `,
+      [id],
+    );
+    return true;
   }
 
   // Ips and requests================================================================

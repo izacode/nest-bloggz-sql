@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -28,13 +29,12 @@ export class AuthService {
   ) {}
 
   async createUser(createUserDto: CreateUserDto): Promise<any> {
-  
+   
     const { login, email, password } = createUserDto;
     // const isUserExists = await this.usersRepository.findUserByLoginOrEmail(login, email)
     // if(isUserExists) throw new BadRequestException();
     const passwordHash = await this._generateHash(password);
     const user = {
-  
       accountData: {
         userName: login,
         email,
@@ -59,7 +59,10 @@ export class AuthService {
       const result = await this.emailService.sendEmailConfirmationMassage(user);
       // const result = await emailManager.sendEmailConfirmationMassage(user);
       if (result) {
-        await this.usersRepository.updateSentEmails(createResult._id, user.accountData.email);
+        await this.usersRepository.updateSentEmails(
+          createResult._id,
+          user.accountData.email,
+        );
       }
     } catch (error) {
       await this.usersRepository.deleteUser(createResult._id);
@@ -75,7 +78,8 @@ export class AuthService {
 
   async validateUser(loginDto: LoginDto) {
     const { login, password } = loginDto;
-    const user: User | null = await this.usersRepository.findUserByLogin(login);
+    const user: User | null = await this.usersRepository.findUserByLogin(login); 
+    console.log(user)
     if (!user) throw new UnauthorizedException();
     const areHashesEqual = await this._isPasswordCorrect(
       password,
@@ -86,6 +90,7 @@ export class AuthService {
   }
 
   async _isPasswordCorrect(password: string, hash: string) {
+    console.log(password, hash)
     const isCorrect = await bcrypt.compare(password, hash);
     return isCorrect;
   }

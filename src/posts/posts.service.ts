@@ -70,6 +70,7 @@ export class PostsService {
         newestLikes: [],
       } as ExtendedLikesInfo,
     } as Post;
+    console.log(typeof newPost.addedAt)
     return this.postsRepository.createPost(newPost);
   }
 
@@ -103,6 +104,7 @@ export class PostsService {
     likeStatusDto: LikeStatusDto,
     currentUserData: any,
   ) {
+  
     const { likeStatus } = likeStatusDto;
 
     let post = await this.postsRepository.getPostForReact(id);

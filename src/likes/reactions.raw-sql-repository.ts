@@ -19,7 +19,7 @@ export class ReactionsRawSqlRepository {
         `
       SELECT "likeStatus", "userId", "commentId"
 	    FROM public."CommentsReactions";
-      WHERE userId = $1 and commentId = $2
+      WHERE "userId" = $1 and "commentId" = $2
       `,
         [userId, commentId],
       );
@@ -74,7 +74,7 @@ export class ReactionsRawSqlRepository {
       `
      SELECT "addedAt", "userId", login
      FROM public."PostsReacitons"
-     WHERE postId = $1 AND likeStatus = 'Like'
+     WHERE "postId" = $1 AND "likeStatus" = 'Like'
      ORDER BY "addedAt" ASC
      LIMIT 3
     `,
@@ -91,12 +91,13 @@ export class ReactionsRawSqlRepository {
       `
      SELECT "addedAt", "userId", login
      FROM public."PostsReacitons"
-     WHERE postId = $1 AND userId = $2
+     WHERE "postId" = $1 AND "userId" = $2
     `,
       [postId, userId],
     );
+    console.log(userPostReaction);
     if (!userPostReaction) return null;
-    return userPostReaction;
+    return userPostReaction[0];
   }
 
   async getUserAllPostsReactions(id: string) {
@@ -105,7 +106,7 @@ export class ReactionsRawSqlRepository {
         `
      SELECT "addedAt", "userId", login
      FROM public."PostsReacitons"
-     WHERE userId = $1
+     WHERE "userId" = $1
      ORDER BY "addedAt" ASC
      LIMIT 3
     `,

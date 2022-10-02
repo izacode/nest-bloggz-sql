@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import mongoose from 'mongoose';
-import { ObjectId } from "mongodb";
+import { ObjectId } from 'mongodb';
 import { FilterDto } from 'src/dto/filter.dto';
 import { v4 as uuidv4 } from 'uuid';
 import * as datefns from 'date-fns';
@@ -10,13 +10,12 @@ import { EmailService } from '../emails/email.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UsersRawSqlRepository } from './users.raw-sql-repository';
 
-
-
-
-
 @Injectable()
 export class UsersService {
-  constructor(private usersRepository: UsersRawSqlRepository,private emailService: EmailService) {}
+  constructor(
+    private usersRepository: UsersRawSqlRepository,
+    private emailService: EmailService,
+  ) {}
 
   async checkRevokedTokensList(refreshToken: string, _id: string) {
     return this.usersRepository.checkRevokedTokensList(refreshToken, _id);
@@ -44,7 +43,6 @@ export class UsersService {
   }
 
   async createUser(createUserDto: CreateUserDto): Promise<any> {
-  
     const { login, email, password } = createUserDto;
     // const isUserExists = await this.usersRepository.findUserByLoginOrEmail(login, email)
     // if(isUserExists) throw new BadRequestException();
@@ -69,23 +67,24 @@ export class UsersService {
         isConfirmed: false,
       },
     };
+    // const createdUser = await this.usersRepository.createUser(user)
   
-    const createResult =
-      await this.usersRepository.findUserByEmail(email);
+
+    const createResult = await this.usersRepository.createUser(user)
     // We would need confirmationCode, email and id as _id
 
     try {
       const result = await this.emailService.sendEmailConfirmationMassage(user);
+    
       // const result = await emailManager.sendEmailConfirmationMassage(user);
       if (result) {
-
         await this.usersRepository.updateSentEmails(createResult._id, email);
       }
     } catch (error) {
       await this.usersRepository.deleteUser(createResult._id);
     }
 
-    return createResult;
+    return;
   }
 
   async _generateHash(password: string) {
