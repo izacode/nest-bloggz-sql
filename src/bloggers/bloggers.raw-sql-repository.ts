@@ -61,34 +61,34 @@ export class BloggersRawSqlRepository {
       [id],
     );
     if (foundBlogger.length === 0) throw new NotFoundException({});
-    return foundBlogger as Blogger;
+    return foundBlogger[0] as Blogger;
   }
 
   async updateBlogger(
     id: string,
     updateBloggerDto: UpdateBloggerDto,
-  ): Promise<boolean> {
+  ): Promise<void> {
     const { name, youtubeUrl } = updateBloggerDto;
-    await this.getBlogger(id);
-    await this.dataSource.query(
+    // await this.getBlogger(id);
+    const result = await this.dataSource.query(
       `
      UPDATE public.bloggers
 	   SET name=$2, "youtubeUrl"=$3
 	   WHERE id= $1`,
       [id, name, youtubeUrl],
     );
-    return true;
+    if (result[1] === 0) throw new NotFoundException({});
+    return;
   }
 
   async deleteBlogger(id: string): Promise<boolean> {
-    await this.getBlogger(id);
-    await this.dataSource.query(
+    const result = await this.dataSource.query(
       `
     DELETE FROM public.bloggers
 	  WHERE id= $1;`,
       [id],
     );
-    return true;
+    if (result[1] === 0) throw new NotFoundException({});
+    return;
   }
-  
 }

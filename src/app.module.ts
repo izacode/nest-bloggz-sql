@@ -14,6 +14,22 @@ import { PostsController } from './posts/posts.controller';
 import { BloggersController } from './bloggers/bloggers.controller';
 import { WalletsModule } from './wallets/wallets.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { PostsService } from './posts/posts.service';
+import { PostsRawSqlRepository } from './posts/posts.raw-sql-repository';
+import { JwtService } from '@nestjs/jwt';
+import { ReactionsRawSqlRepository } from './likes/reactions.raw-sql-repository';
+import { ReactionsService } from './likes/reactions.service';
+import { EmailAdapter } from './emails/email.adapter';
+import { UsersService } from './users/users.service';
+import { UsersRawSqlRepository } from './users/users.raw-sql-repository';
+import { AuthService } from './auth/auth.service';
+import { EmailService } from './emails/email.service';
+import { EmailManager } from './emails/email.manager';
+import { CommentsService } from './comments/comments.service';
+import { CommentsRawSqlRepository } from './comments/comments.raw-sql-repository';
+import { BloggersService } from './bloggers/bloggers.service';
+import { BloggersRawSqlRepository } from './bloggers/bloggers.raw-sql-repository';
+import { TestingClearService } from './testing/testing-clear.service';
 
 @Module({
   imports: [
@@ -54,6 +70,24 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
     WalletsModule,
   ],
+  // providers: [
+  //   PostsService,
+  //   PostsRawSqlRepository,
+  //   JwtService,
+  //   ReactionsRawSqlRepository,
+  //   ReactionsService,
+  //   EmailAdapter,
+  //   UsersService,
+  //   UsersRawSqlRepository,
+  //   AuthService,
+  //   EmailService,
+  //   EmailManager,
+  //   CommentsService,
+  //   CommentsRawSqlRepository,
+  //   BloggersService,
+  //   BloggersRawSqlRepository,
+  //   TestingClearService,
+  // ],
 })
 export class AppModule {
   // configure(consumer: MiddlewareConsumer) {

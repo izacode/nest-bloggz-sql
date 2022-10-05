@@ -18,7 +18,7 @@ export class BloggersService {
   }
 
   async createBlogger(createBloggerDto: CreateBloggerDto) {
-    await validateOrReject(createBloggerDto);
+    // await validateOrReject(createBloggerDto);
     const { name, youtubeUrl } = createBloggerDto;
     const newBlogger = {
       id: (+new Date()).toString(),
@@ -35,7 +35,7 @@ export class BloggersService {
   async updateBlogger(
     id: string,
     updateBloggerDto: UpdateBloggerDto,
-  ): Promise<boolean> {
+  ): Promise<void> {
     return this.bloggersRepository.updateBlogger(id, updateBloggerDto);
   }
 

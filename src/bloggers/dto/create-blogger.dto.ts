@@ -1,4 +1,11 @@
-import { IsNotEmpty, IsOptional, IsString, Length, MaxLength } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Length,
+  Matches,
+  MaxLength,
+} from 'class-validator';
 
 export class CreateBloggerDto {
   @IsOptional()
@@ -10,5 +17,6 @@ export class CreateBloggerDto {
 
   @IsString()
   @MaxLength(100)
+  @Matches(/^https:\/\/([\w-]+\.)+[\w-]+(\/[\w-]+)*\/?$/)
   youtubeUrl: string;
 }

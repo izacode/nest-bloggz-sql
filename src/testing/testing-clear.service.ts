@@ -14,7 +14,7 @@ import { User } from '../schemas/user.schema';
 @Injectable()
 export class TestingClearService {
   constructor(@InjectDataSource() protected dataSource: DataSource) {}
-  async dropTestBase() {
+  async clearDB() {
     try {
       await this.dataSource.query(`
       DELETE FROM public.bloggers
