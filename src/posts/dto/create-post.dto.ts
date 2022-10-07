@@ -16,5 +16,4 @@ export class CreatePostDto {
   @IsNotEmpty()
   @IsString()
   bloggerId: string;
-
 }

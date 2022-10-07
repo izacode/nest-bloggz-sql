@@ -136,7 +136,7 @@ export class UsersRawSqlRepository {
   async findUserByEmail(email: string): Promise<User> {
     const user = await this.dataSource.query(
       `
-    SELECT id as _id, email, "confirmationCode"
+    SELECT id as _id, email, "confirmationCode", "userName"
     FROM "Users"
     WHERE email = $1
     `,

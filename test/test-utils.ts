@@ -1,9 +1,14 @@
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import {
+  BadRequestException,
+  INestApplication,
+  ValidationPipe,
+} from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from './../src/app.module';
-import { HttpExceptionFilter } from './../src/exception.filter';
 import { DataSource } from 'typeorm';
-import cookieParser from 'cookie-parser';
+// import { createApp } from './../src/main';
+import * as cookieParser from 'cookie-parser';
+import { HttpExceptionFilter } from './../src/exception.filter';
 
 export const getAppAndCleanDB = async () => {
   const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -11,10 +16,31 @@ export const getAppAndCleanDB = async () => {
   }).compile();
 
   let app: INestApplication;
+  // let app;
 
   app = moduleFixture.createNestApplication();
+  // app = createApp(app);
   app.enableCors();
-  app.useGlobalPipes(new ValidationPipe());
+  app.use(cookieParser());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      // stopAtFirstError: true,
+      // Here we configure what globalPipes will send to GlobalFilters(errors)
+      exceptionFactory: (errors) => {
+        const errorsForResponse = [];
+        errors.forEach((e) => {
+          const constraintsKeys = Object.keys(e.constraints);
+          constraintsKeys.forEach((ckey) => {
+            errorsForResponse.push({
+              message: e.constraints[ckey],
+              field: e.property,
+            });
+          });
+        });
+        throw new BadRequestException(errorsForResponse);
+      },
+    }),
+  );
   app.useGlobalFilters(new HttpExceptionFilter());
   await app.init();
 

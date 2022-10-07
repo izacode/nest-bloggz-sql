@@ -57,18 +57,17 @@ export class AuthService {
 
     try {
       const result = await this.emailService.sendEmailConfirmationMassage(user);
-      // const result = await emailManager.sendEmailConfirmationMassage(user);
       if (result) {
         await this.usersRepository.updateSentEmails(
           createResult._id,
-          user.accountData.email,
+          email,
         );
       }
     } catch (error) {
       await this.usersRepository.deleteUser(createResult._id);
     }
 
-    return createResult;
+    return;
   }
 
   async _generateHash(password: string) {

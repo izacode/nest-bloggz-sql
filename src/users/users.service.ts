@@ -67,24 +67,19 @@ export class UsersService {
         isConfirmed: false,
       },
     };
-    // const createdUser = await this.usersRepository.createUser(user)
-  
-
-    const createResult = await this.usersRepository.createUser(user)
+    const createResult = await this.usersRepository.createUser(user);
     // We would need confirmationCode, email and id as _id
 
     try {
       const result = await this.emailService.sendEmailConfirmationMassage(user);
-    
-      // const result = await emailManager.sendEmailConfirmationMassage(user);
       if (result) {
         await this.usersRepository.updateSentEmails(createResult._id, email);
       }
     } catch (error) {
       await this.usersRepository.deleteUser(createResult._id);
     }
-
-    return;
+    const userToReturn = { id: createResult._id, login: createResult.userName };
+    return userToReturn;
   }
 
   async _generateHash(password: string) {

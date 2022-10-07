@@ -62,7 +62,7 @@ export class PostsService {
       content,
       bloggerId,
       bloggerName: blogger.name,
-      addedAt: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
       extendedLikesInfo: {
         likesCount: 0,
         dislikesCount: 0,
@@ -70,7 +70,7 @@ export class PostsService {
         newestLikes: [],
       } as ExtendedLikesInfo,
     } as Post;
-    console.log(typeof newPost.addedAt)
+
     return this.postsRepository.createPost(newPost);
   }
 

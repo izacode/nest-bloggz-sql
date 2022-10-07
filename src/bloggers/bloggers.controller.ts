@@ -80,7 +80,7 @@ export class BloggersController {
     );
     return bloggerPosts;
   }
-  @UseGuards(BasicAuthGuard)
+  // @UseGuards(BasicAuthGuard)
   @Post('/:id/posts')
   @HttpCode(201)
   async createBloggerPost(

@@ -32,7 +32,7 @@ export class Post extends Document {
   @Prop()
   bloggerName: string;
   @Prop()
-  addedAt: string;
+  createdAt: string;
   @Prop({ type: ExtendedLikesInfoSchema })
   extendedLikesInfo: ExtendedLikesInfo;
 }

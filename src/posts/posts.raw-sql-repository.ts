@@ -13,7 +13,6 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { ReactionsRawSqlRepository } from '../likes/reactions.raw-sql-repository';
 
-
 @Injectable()
 export class PostsRawSqlRepository {
   constructor(
@@ -28,6 +27,8 @@ export class PostsRawSqlRepository {
       shortDescription,
       content,
       bloggerId,
+      name,
+      createdAt,
       likesCount,
       dislikesCount,
       myStatus,
@@ -37,7 +38,9 @@ export class PostsRawSqlRepository {
       title,
       shortDescription,
       content,
+      createdAt,
       bloggerId,
+      bloggerName: name,
       extendedLikesInfo: {
         likesCount,
         dislikesCount,
@@ -64,8 +67,9 @@ export class PostsRawSqlRepository {
 
     let posts: Post[] = await this.dataSource.query(
       `
-     SELECT *
-     FROM public."Posts"
+    SELECT p.*, b.name 
+    FROM "Posts" as p
+    LEFT JOIN bloggers as b ON p."bloggerId" = b.id 
      WHERE title LIKE ('%'||$1||'%') or "bloggerId" LIKE ('%'||$1||'%')
      LIMIT $2 OFFSET $3
       `,
@@ -126,7 +130,7 @@ export class PostsRawSqlRepository {
   }
 
   async createPost(newPost: Post): Promise<Post | null> {
-    const { id, title, shortDescription, content, bloggerId, addedAt } =
+    const { id, title, shortDescription, content, bloggerId, createdAt } =
       newPost;
     await this.dataSource.query(
       `
@@ -134,26 +138,32 @@ export class PostsRawSqlRepository {
 	 id, title, "shortDescription", content, "bloggerId", "createdAt", "likesCount", "dislikesCount", "myStatus")
 	 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);
    `,
-      [id, title, shortDescription, content, bloggerId, addedAt, 0, 0, 'None'],
+      [
+        id,
+        title,
+        shortDescription,
+        content,
+        bloggerId,
+        createdAt,
+        0,
+        0,
+        'None',
+      ],
     );
     return newPost as Post;
   }
 
   async getPost(id: string, userInfo?: any): Promise<Post> {
-   
-
     let post = await this.dataSource.query(
       `
     SELECT p.*, b.name 
     FROM "Posts" as p
-    JOIN bloggers as b ON p."bloggerId" = b.id 
+    LEFT JOIN bloggers as b ON p."bloggerId" = b.id 
     LEFT JOIN public."PostsReacitons" as pr ON pr."postId" = $1 AND pr."userId" = $2 
     WHERE p.id = $1
     `,
       [id, userInfo?.sub],
     );
- 
-    console.log(post);
 
     if (post.length === 0) throw new NotFoundException();
 

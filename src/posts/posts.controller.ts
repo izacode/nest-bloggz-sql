@@ -35,7 +35,7 @@ export class PostsController {
     return this.postsService.getPosts(filterDto, headers);
   }
 
-  @UseGuards(BasicAuthGuard)
+  // @UseGuards(BasicAuthGuard)
   @Post()
   async createPost(@Body() createPostDto: CreatePostDto) {
     const createdPost = await this.postsService.createPost(createPostDto);
@@ -47,7 +47,7 @@ export class PostsController {
     return post;
   }
 
-  @UseGuards(BasicAuthGuard)
+  // @UseGuards(BasicAuthGuard)
   @Put('/:id')
   @HttpCode(204)
   async updatePost(
@@ -102,7 +102,6 @@ export class PostsController {
     return newComment;
   }
 
-  // Implement middleware for case if likeStatus in ""
 
   @UseGuards(JwtAuthGuard)
   @Put('/:id/like-status')

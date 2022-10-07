@@ -6,8 +6,11 @@ import { AppModule } from './../src/app.module';
 import { DataSource } from 'typeorm';
 import { getAppAndCleanDB } from './../test/test-utils';
 import { CustomResponseType } from '../src/types';
+import { isUUID } from 'class-validator';
 
 let bloggerId: string = '';
+let postId: string;
+let newPost;
 
 let bloggerUpdated = {
   id: bloggerId,
@@ -33,6 +36,11 @@ describe('BloggersController (e2e)', () => {
   beforeAll(async () => {
     app = await getAppAndCleanDB();
   });
+  afterAll(async () => {
+    await app.close();
+  });
+
+  //   CREATING BLOGGER ============================================================================================================
 
   describe('Creating new Blogger', () => {
     it('Should return an error if wrong name is provided, status 400 ', async () => {
@@ -67,8 +75,14 @@ describe('BloggersController (e2e)', () => {
             youtubeUrl: 'https://www.youtube.com',
           });
         });
+      // const res = await request(app.getHttpServer()).post('/bloggers').send(bloggerAlex)
+      // expect(res.status).toBe(201)
+      // expect(res.body).not.toBeUndefined
+      // const isUuid = isUUID(res.body.id)
     });
   });
+
+  //   GETTING BLOGGER ============================================================================================================
 
   describe('Getting a blogger', () => {
     it('Should return blogger by id with status 200 ', async () => {
@@ -84,6 +98,8 @@ describe('BloggersController (e2e)', () => {
       return request(app.getHttpServer()).get('/bloggers/11111111').expect(404);
     });
   });
+
+  //   UPDATING BLOGGER ============================================================================================================
 
   describe('Updating a blogger', () => {
     it('SHould update a blogger and return a status 204', async () => {
@@ -113,12 +129,18 @@ describe('BloggersController (e2e)', () => {
         })
         .expect(400);
     });
-     it('Should return an 404 error if blogger is not found', async () => {
-       return request(app.getHttpServer())
-         .put('/bloggers/11111111')
-         .expect(404);
-     });
+    it('Should return an 404 error if blogger is not found', async () => {
+      return request(app.getHttpServer())
+        .put('/bloggers/11111111')
+        .send({
+          name: 'UPDATED',
+          youtubeUrl: 'https://www.youtubeUPDATED.com',
+        })
+        .expect(404);
+    });
   });
+
+  //   GETTING ALL BLOGGERS ============================================================================================================
 
   describe('Getting all bloggers', () => {
     describe('without serch filter and query params', () => {
@@ -127,7 +149,6 @@ describe('BloggersController (e2e)', () => {
           .get(`/bloggers`)
           .expect(200)
           .then(({ body }) => {
-            console.log('this.is body-----', body);
             expect(body).toEqual({
               ...customResponse,
               items: [{ ...bloggerUpdated, id: bloggerId }],
@@ -165,6 +186,101 @@ describe('BloggersController (e2e)', () => {
       });
     });
   });
+
+  //  CREATING BLOGGERS POST ========================================================================================================
+  describe('Create blogger post', () => {
+
+    it('Should return an error if unaccepted title  is provided, status 400 ', async () => {
+      return request(app.getHttpServer())
+        .post(`/bloggers/${bloggerId}/posts`)
+        .send({
+          title: '',
+          shortDescription: 'some description',
+          content: 'some content',
+         
+        })
+        .expect(400);
+    });
+    it('Should return an error if unaccepted shortDescription is provided, status 400 ', async () => {
+      return request(app.getHttpServer())
+        .post(`/bloggers/${bloggerId}/posts`)
+        .send({
+          title: 'some title',
+          shortDescription: '',
+          content: 'some content',
+
+        })
+        .expect(400);
+    });
+    it('Should return an error if unaccepted content is provided, status 400 ', async () => {
+      return request(app.getHttpServer())
+        .post(`/bloggers/${bloggerId}/posts`)
+        .send({
+          title: 'some title',
+          shortDescription: 'some description',
+          content: ''
+        })
+        .expect(400);
+    });
+    
+    it('Should return an error if blogger doesnt exist , status 404 ', async () => {
+      return request(app.getHttpServer())
+        .post(`/bloggers/11111111/posts`)
+        .send({
+          title: 'some title',
+          shortDescription: 'some description',
+          content: 'some content',
+        })
+        .expect(404);
+    });
+
+    it('Should create  bloggers new post with status 201 ', async () => {
+      return request(app.getHttpServer())
+        .post(`/bloggers/${bloggerId}/posts`)
+        .send({
+          title: 'some title',
+          shortDescription: 'some description',
+          content: 'some content',
+        })
+        .expect(201)
+        .then(({ body }) => {
+          postId = body.id;
+          newPost = body;
+          expect(body).toEqual({
+            id: postId,
+            title: 'some title',
+            shortDescription: 'some description',
+            content: 'some content',
+            bloggerId,
+            bloggerName: expect.any(String),
+            createdAt: expect.any(String),
+            extendedLikesInfo: {
+              likesCount: 0,
+              dislikesCount: 0,
+              myStatus: 'None',
+              newestLikes: [],
+            },
+          });
+        });
+    });
+  });
+  //  GETTING BLOGGERS POSTS ========================================================================================================
+
+ describe('Getting  all blogger posts', () => {
+   it('Should return array of all bloggers posts status 200 ', async () => {
+     return request(app.getHttpServer())
+       .get(`/bloggers/${bloggerId}/posts`)
+       .expect(200)
+       .then(({ body }) => {
+         expect(body).toEqual({
+           ...customResponse,
+           items: [newPost],
+         });
+       });
+   });
+ });
+
+  //   DELETING BLOGGER ============================================================================================================
 
   describe('Delete blogger', () => {
     it('Should delete a blogger by id ,return status 204 ', async () => {
