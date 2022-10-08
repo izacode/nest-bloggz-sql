@@ -78,7 +78,11 @@ export class UsersService {
     } catch (error) {
       await this.usersRepository.deleteUser(createResult._id);
     }
-    const userToReturn = { id: createResult._id, login: createResult.userName };
+
+    const userToReturn = {
+      id: createResult._id,
+      login: createResult.accountData.userName,
+    };
     return userToReturn;
   }
 

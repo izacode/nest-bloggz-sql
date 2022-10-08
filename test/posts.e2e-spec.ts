@@ -227,6 +227,20 @@ describe('PostsController (e2e)', () => {
   //   GETTING ALL POSTS ============================================================================================================
 
   describe('Getting all posts', () => {
+    describe('with SearchNameTerm and without other filters', () => {
+      it('Should return array of all posts status 200 ', async () => {
+        return request(app.getHttpServer())
+          .get(`/posts`)
+          .query({ SearchNameTerm: 's' })
+          .expect(200)
+          .then(({ body }) => {
+            expect(body).toEqual({
+              ...customResponse,
+              items: [newPost],
+            });
+          });
+      });
+    });
     describe('without serch filter and query params', () => {
       it('Should return array of all posts status 200 ', async () => {
         return request(app.getHttpServer())
@@ -241,21 +255,6 @@ describe('PostsController (e2e)', () => {
       });
     });
 
-    describe('with SearchNameTerm and without other filters', () => {
-      it('Should return array of all posts status 200 ', async () => {
-        return request(app.getHttpServer())
-          .get(`/posts`)
-          .query({ SearchNameTerm: 's' })
-          .expect(200)
-          .then(({ body }) => {
-            console.log('body', body);
-            expect(body).toEqual({
-              ...customResponse,
-              items: [newPost],
-            });
-          });
-      });
-    });
     describe('without serch and with filter query params', () => {
       it('Should return array of all bloggers status 200 ', async () => {
         return request(app.getHttpServer())

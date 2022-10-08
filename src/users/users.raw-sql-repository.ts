@@ -64,10 +64,12 @@ export class UsersRawSqlRepository {
       [+PageSize, offset],
     );
 
-    const totalCount: number = await this.dataSource.query(`
+    const totalCount: number = +(
+      await this.dataSource.query(`
     SELECT COUNT(*)
     FROM "Users"
-    `);
+    `)
+    )[0].count;
 
     const customResponse = {
       pagesCount: Math.ceil(totalCount / +PageSize),
@@ -118,15 +120,14 @@ export class UsersRawSqlRepository {
       [login],
     );
     if (user.length === 0) return null;
-    const {id, email, userName, passwordHash} = user[0]
-   
+    const { id, email, userName, passwordHash } = user[0];
+
     const dataToReturn = {
       _id: id,
       accountData: {
         email,
         userName,
         passwordHash,
-
       },
     };
 
@@ -143,12 +144,11 @@ export class UsersRawSqlRepository {
       [email],
     );
     if (user.length === 0) return null;
-  
+
     return user[0];
   }
 
   async getUserById(id): Promise<User | null> {
-   
     let user = await this.dataSource.query(
       `
     SELECT id, "userName", email
@@ -158,7 +158,7 @@ export class UsersRawSqlRepository {
       [id],
     );
     if (user.length === 0) throw new NotFoundException();
-    const {userName, email} = user[0]   
+    const { userName, email } = user[0];
 
     const userToReturn = {
       _id: user[0].id,
@@ -166,7 +166,7 @@ export class UsersRawSqlRepository {
         userName,
         email,
       },
-    }
+    };
     return userToReturn as User;
   }
 
@@ -227,19 +227,16 @@ export class UsersRawSqlRepository {
   }
 
   async deleteUser(id: string): Promise<boolean> {
-    try {
-      await this.getUserById(id);
-    } catch (error) {
-      console.log(error.message);
-    }
-
-    await this.dataSource.query(
+    const result = await this.dataSource.query(
       `
      DELETE FROM public."Users"
 	   WHERE id = $1;
      `,
       [id],
     );
+
+    if (result[1] === 0) throw new NotFoundException({});
+
     return true;
   }
 

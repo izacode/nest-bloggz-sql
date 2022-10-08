@@ -1,8 +1,6 @@
-
-import {  INestApplication,} from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { getAppAndCleanDB } from './../test/test-utils';
-
 
 let userId: string;
 let newUser;
@@ -14,7 +12,6 @@ let customResponse = {
   totalCount: 1,
   items: [],
 };
-
 
 describe('UsersController (e2e)', () => {
   let app: INestApplication;
@@ -69,24 +66,21 @@ describe('UsersController (e2e)', () => {
           newUser = body;
           expect(body).toEqual({
             id: userId,
-            login: 'user1'
+            login: 'user1',
           });
         });
     });
-    
-   
   });
 
   //   GETTING ALL USERS ============================================================================================================
 
   describe('Getting all users', () => {
     describe('without PageNumber and without PageSize', () => {
-      it('Should return array of all posts status 200 ', async () => {
+      it('Should return array of all users status 200 ', async () => {
         return request(app.getHttpServer())
           .get(`/users`)
           .expect(200)
           .then(({ body }) => {
-            console.log('this.is body-----', body);
             expect(body).toEqual({
               ...customResponse,
               items: [newUser],
@@ -95,10 +89,10 @@ describe('UsersController (e2e)', () => {
       });
     });
     describe('with PageNumber and without PageSize', () => {
-      it('Should return array of all bloggers status 200 ', async () => {
+      it('Should return array of all users status 200 ', async () => {
         return request(app.getHttpServer())
-          .get(`/bloggers`)
-          .query({ PageNumber: 2})
+          .get(`/users`)
+          .query({ PageNumber: 2 })
           .expect(200)
           .then(({ body }) => {
             expect(body).toEqual({
@@ -109,9 +103,9 @@ describe('UsersController (e2e)', () => {
       });
     });
     describe('without PageNumber and with PageSize', () => {
-      it('Should return array of all bloggers status 200 ', async () => {
+      it('Should return array of all posts status 200 ', async () => {
         return request(app.getHttpServer())
-          .get(`/bloggers`)
+          .get(`/users`)
           .query({ PageSize: 5 })
           .expect(200)
           .then(({ body }) => {
@@ -124,9 +118,9 @@ describe('UsersController (e2e)', () => {
       });
     });
     describe('with PageNumber and with PageSize', () => {
-      it('Should return array of all bloggers status 200 ', async () => {
+      it('Should return array of all users status 200 ', async () => {
         return request(app.getHttpServer())
-          .get(`/bloggers`)
+          .get(`/users`)
           .query({ PageNumber: 2, PageSize: 5 })
           .expect(200)
           .then(({ body }) => {
@@ -142,17 +136,17 @@ describe('UsersController (e2e)', () => {
 
   //   DELETING USER ============================================================================================================
 
-//   describe('Delete user', () => {
-//     it('Should return 404, if user doesnt exist ', async () => {
-//       return request(app.getHttpServer())
-//         .delete(`/users/${userId}`)
-//         .expect(404);
-//     });
+  describe('Delete user', () => {
+    it('Should return 404, if user doesnt exist ', async () => {
+      return request(app.getHttpServer())
+        .delete(`/users/18c5de8c-8f8c-4de9-b1dd-a6b4f76b5dfb`)
+        .expect(404);
+    });
 
-//     it('Should delete a user by id ,return status 204 ', async () => {
-//       return request(app.getHttpServer())
-//         .delete(`/users/${userId}`)
-//         .expect(204);
-//     });
-//   });
+    it('Should delete a user by id ,return status 204 ', async () => {
+      return request(app.getHttpServer())
+        .delete(`/users/${userId}`)
+        .expect(204);
+    });
+  });
 });
