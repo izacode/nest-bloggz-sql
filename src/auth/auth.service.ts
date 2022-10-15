@@ -29,10 +29,13 @@ export class AuthService {
   ) {}
 
   async createUser(createUserDto: CreateUserDto): Promise<any> {
-   
     const { login, email, password } = createUserDto;
-    // const isUserExists = await this.usersRepository.findUserByLoginOrEmail(login, email)
-    // if(isUserExists) throw new BadRequestException();
+    const isUserExists = await this.usersRepository.findUserByLoginOrEmail(
+      login,
+      email,
+    );
+    debugger;
+    if (!isUserExists) throw new BadRequestException();
     const passwordHash = await this._generateHash(password);
     const user = {
       accountData: {
@@ -47,8 +50,10 @@ export class AuthService {
         sentEmails: [], //Add to send emails, create counter or smth
         confirmationCode: uuidv4(),
         expirationDate: datefns.add(new Date(), {
-          days: 1,
+          days: 0,
           hours: 0,
+          minutes: 0,
+          seconds: 29,
         }),
         isConfirmed: false,
       },
@@ -58,10 +63,7 @@ export class AuthService {
     try {
       const result = await this.emailService.sendEmailConfirmationMassage(user);
       if (result) {
-        await this.usersRepository.updateSentEmails(
-          createResult._id,
-          email,
-        );
+        await this.usersRepository.updateSentEmails(createResult._id, email);
       }
     } catch (error) {
       await this.usersRepository.deleteUser(createResult._id);
@@ -77,8 +79,7 @@ export class AuthService {
 
   async validateUser(loginDto: LoginDto) {
     const { login, password } = loginDto;
-    const user: User | null = await this.usersRepository.findUserByLogin(login); 
-    console.log(user)
+    const user: User | null = await this.usersRepository.findUserByLogin(login);
     if (!user) throw new UnauthorizedException();
     const areHashesEqual = await this._isPasswordCorrect(
       password,
@@ -89,31 +90,27 @@ export class AuthService {
   }
 
   async _isPasswordCorrect(password: string, hash: string) {
-    console.log(password, hash)
     const isCorrect = await bcrypt.compare(password, hash);
     return isCorrect;
   }
 
-  async confirmEmail(code: string): Promise<boolean> {
+  async confirmEmail(code: string): Promise<void> {
     const user: User = await this.usersRepository.findUserByConfirmationCode(
       code,
     );
-    if (!user) return false;
-    // if (user.emailConfirmation.isConfirmed) return false;
-    if (user.emailConfirmation.expirationDate < new Date()) return false;
-    let result: boolean = await this.usersRepository.updateConfirmationStatus(
-      user._id,
-    );
-    return result;
+    if (!user) throw new NotFoundException();
+
+    if (user.emailConfirmation.isConfirmed) throw new BadRequestException();
+    if (user.emailConfirmation.expirationDate < new Date())
+      throw new BadRequestException();
+    return this.usersRepository.updateConfirmationStatus(user._id);
   }
   async resendConfirmaitionEmail(emailDto: EmailDto): Promise<boolean> {
     const { email } = emailDto;
     // 1) Checking if user with this email exists
     const user: User = await this.usersRepository.findUserByEmail(email);
-    if (!user) throw new NotFoundException();
 
-    // if (user.emailConfirmation.expirationDate < new Date()) return false;
-    // let result = await this.usersRepository.updateConfirmation(user._id);
+    if (!user) throw new NotFoundException();
 
     // 2) If exists -> generate new confirmation code
     const newConfirmationCode: string = uuidv4();
@@ -129,6 +126,7 @@ export class AuthService {
 
     //  5-1) Trying to resend confirmatin email
     try {
+      debugger;
       const result = await this.emailService.sendEmailConfirmationMassage(
         updatedUser,
       );
@@ -139,9 +137,11 @@ export class AuthService {
       return result;
     } catch (error) {
       // 5-2) If there is an error, we are deleting this user
+
       await this.usersRepository.deleteUser(user._id);
       console.log('registration failed , pls try once again');
     }
+
     return false;
   }
 
@@ -151,6 +151,7 @@ export class AuthService {
   }
 
   async validateToken(token: string) {
+    debugger;
     let result: any;
     try {
       result = this.jwtService.verify(token, {

@@ -10,7 +10,6 @@ import {
   Res,
 } from '@nestjs/common';
 
-
 import { CurrentUserData } from '../common/current-user-data.param.decorator';
 // import { JwtService } from './application/jwt.service';
 import { EmailDto } from '../dto/email.dto';
@@ -47,6 +46,7 @@ export class AuthController {
   @Post('/registration-email-resending')
   async resendConfirmaitionEmail(@Body() emailDto: EmailDto) {
     const result = await this.authService.resendConfirmaitionEmail(emailDto);
+    debugger;
     if (!result) throw new BadRequestException();
     return;
   }
@@ -63,7 +63,6 @@ export class AuthController {
 
     // IIFE solution
     // let payload = (({ sub, username }) => ({ sub, username }))(currentUserData);
- 
 
     const accessToken = await this.authService.createToken(
       payload,
@@ -77,11 +76,11 @@ export class AuthController {
       await this.config.get('JWT_REFRESH_EXPIRATION'),
     );
 
-    // response.cookie('refreshToken', refreshToken);
-    response.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: true,
-    });
+    response.cookie('refreshToken', refreshToken);
+    // response.cookie('refreshToken', refreshToken, {
+    //   httpOnly: true,
+    //   secure: true,
+    // });
 
     return { accessToken, refreshToken };
   }
@@ -96,12 +95,13 @@ export class AuthController {
     };
     return userInfo;
   }
-
-  @Post('refresh-token')
+  @HttpCode(200)
+  @Post('/refresh-token')
   async refreshTokens(
     @Cookies('refreshToken') refreshToken: string,
     @Res({ passthrough: true }) response: Response,
   ) {
+    debugger;
     const { sub, username } = await this.authService.validateToken(
       refreshToken,
     );

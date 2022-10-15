@@ -9,6 +9,7 @@ import * as bcrypt from 'bcrypt';
 import { EmailService } from '../emails/email.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UsersRawSqlRepository } from './users.raw-sql-repository';
+import { User } from '../schemas/user.schema';
 
 @Injectable()
 export class UsersService {
@@ -89,5 +90,9 @@ export class UsersService {
   async _generateHash(password: string) {
     const hashh = await bcrypt.hash(password, 10);
     return hashh;
+  }
+
+  async getFullUser(id: string): Promise<User> {
+    return this.usersRepository.getFullUser(id);
   }
 }

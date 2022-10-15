@@ -16,6 +16,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     // if(status===409) return response.sendStatus(status)
 
     const responseBodyForLikestatus: any = exception.getResponse();
+ 
     if (status === 400 && !request.headers) return response.sendStatus(401)
       if (
         status === 400 &&
@@ -36,14 +37,17 @@ export class HttpExceptionFilter implements ExceptionFilter {
         errors: [],
       };
       const responseBody: any = exception.getResponse();
-      // if (responseBody.message === 'Validation failed (uuid is expected)') {
       if (responseBody.message === 'Validation failed (uuid is expected)') {
         errorResponse.errors.push({
           message: 'Validation failed (uuid is expected)',
           field: 'code',
         });
+      }else if (responseBody.message === 'Bad Request') {
+        errorResponse.errors.push({
+          message: 'Bad Request',
+          field: 'any',
+        });
       } else {
-      
         responseBody.message.forEach((m) => {
           let isFieldExists = errorResponse.errors.find(
             (mes) => mes.field === m.field,

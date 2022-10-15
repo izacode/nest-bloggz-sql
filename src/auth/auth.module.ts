@@ -18,7 +18,7 @@ import { UsersService } from '../users/users.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { BasicStrategy } from './strategies/basic.strategy';
 import { UsersRawSqlRepository } from '../users/users.raw-sql-repository';
-import { AttemptsRawSqlMiddleware } from '../middleware/attempts.raw-sql-middleware';
+import { AttemptsRawSqlMiddleware } from '../middleware/attempts.raw-sql.middleware';
 
 @Module({
   imports: [PassportModule, JwtModule],

@@ -15,7 +15,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(login: string, password: string): Promise<any> {
-    ;
+    
     const loginDto: LoginDto = {
       login,
       password,

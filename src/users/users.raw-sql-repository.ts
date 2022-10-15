@@ -23,16 +23,19 @@ export class UsersRawSqlRepository {
     refreshToken: string,
     _id: string,
   ): Promise<Boolean> {
+    console.log('result- checkRevokedTokensList', 'before');
+    debugger;
     const result = await this.dataSource.query(
       `
     SELECT token, "userId"
 	  FROM public."RevokedRefreshTokens"
-    WHERE token = $1 && "userId" = $2;
+    WHERE token = $1 AND "userId" = $2;
     `,
       [refreshToken, _id],
     );
+    console.log('result- checkRevokedTokensList', result);
 
-    return result ? true : false;
+    return result[0] ? true : false;
   }
 
   async updateRevokedTokensList(
@@ -144,8 +147,27 @@ export class UsersRawSqlRepository {
       [email],
     );
     if (user.length === 0) return null;
+    const userToReturn = {
+      _id: user[0]._id,
+      emailConfirmation: { confirmationCode: user[0].confirmationCode },
+      accountData: { email: user[0].email },
+    };
 
-    return user[0];
+    return userToReturn as User;
+  }
+
+  async findUserByLoginOrEmail(login: string, email: string): Promise<User> {
+    const user = await this.dataSource.query(
+      `
+    SELECT id 
+    FROM "Users"
+    WHERE "userName" = $1 OR email = $2
+    `,
+      [login, email],
+    );
+    if (user.length !== 0) return null;
+
+    return user;
   }
 
   async getUserById(id): Promise<User | null> {
@@ -171,9 +193,10 @@ export class UsersRawSqlRepository {
   }
 
   async findUserByConfirmationCode(code: string): Promise<User | null> {
+    debugger;
     let user = await this.dataSource.query(
       `
-    SELECT id, "expirationDate"
+    SELECT id, "expirationDate","isConfirmed"
     FROM "Users"
     WHERE "confirmationCode" = $1
     `,
@@ -185,13 +208,14 @@ export class UsersRawSqlRepository {
       _id: user[0].id,
       emailConfirmation: {
         expirationDate: user[0].expirationDate,
+        isConfirmed: user[0].isConfirmed,
       },
     };
     return userToReturn;
   }
 
-  async updateConfirmationStatus(_id: string): Promise<boolean> {
-    await this.dataSource.query(
+  async updateConfirmationStatus(_id: string): Promise<void> {
+    const result = await this.dataSource.query(
       `
     UPDATE public."Users"
 	  SET "isConfirmed"= true
@@ -199,11 +223,12 @@ export class UsersRawSqlRepository {
     `,
       [_id],
     );
-    return true;
+    if (result[1] === 0) throw new NotFoundException({});
+    return;
   }
 
-  async updateConfirmationCode(_id: string, newCode: string): Promise<boolean> {
-    await this.dataSource.query(
+  async updateConfirmationCode(_id: string, newCode: string): Promise<void> {
+    const result = await this.dataSource.query(
       `
     UPDATE public."Users"
 	  SET "confirmationCode"= $2
@@ -211,7 +236,8 @@ export class UsersRawSqlRepository {
     `,
       [_id, newCode],
     );
-    return true;
+    if (result[1] === 0) throw new NotFoundException({});
+    return;
   }
 
   async updateSentEmails(_id: string, email: string): Promise<boolean> {
@@ -234,10 +260,21 @@ export class UsersRawSqlRepository {
      `,
       [id],
     );
-
     if (result[1] === 0) throw new NotFoundException({});
-
     return true;
+  }
+
+  async getFullUser(id: string): Promise<User> {
+    let user = await this.dataSource.query(
+      `
+    SELECT *
+    FROM "Users"
+    WHERE id = $1
+    `,
+      [id],
+    );
+    if (user[0] === 0) throw new NotFoundException({});
+    return user[0] as User;
   }
 
   // Ips and requests================================================================

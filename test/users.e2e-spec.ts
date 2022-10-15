@@ -42,7 +42,7 @@ describe('UsersController (e2e)', () => {
         })
         .expect(400);
     });
-    it('Should return an error if unaccepted login is provided, status 400 ', async () => {
+    it('Should return an error if unaccepted password is provided, status 400 ', async () => {
       return request(app.getHttpServer())
         .post('/users')
         .send({
@@ -136,17 +136,17 @@ describe('UsersController (e2e)', () => {
 
   //   DELETING USER ============================================================================================================
 
-  describe('Delete user', () => {
-    it('Should return 404, if user doesnt exist ', async () => {
-      return request(app.getHttpServer())
-        .delete(`/users/18c5de8c-8f8c-4de9-b1dd-a6b4f76b5dfb`)
-        .expect(404);
-    });
+  // describe('Delete user', () => {
+  //   it('Should return 404, if user doesnt exist ', async () => {
+  //     return request(app.getHttpServer())
+  //       .delete(`/users/18c5de8c-8f8c-4de9-b1dd-a6b4f76b5dfb`)
+  //       .expect(404);
+  //   });
 
-    it('Should delete a user by id ,return status 204 ', async () => {
-      return request(app.getHttpServer())
-        .delete(`/users/${userId}`)
-        .expect(204);
-    });
-  });
+  //   it('Should delete a user by id ,return status 204 ', async () => {
+  //     return request(app.getHttpServer())
+  //       .delete(`/users/${userId}`)
+  //       .expect(204);
+  //   });
+  // });
 });

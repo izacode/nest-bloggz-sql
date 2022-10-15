@@ -15,9 +15,7 @@ import { UsersService } from './users.service';
 
 @Controller('users')
 export class UsersController {
-  constructor(
-    private usersService: UsersService
-  ) {}
+  constructor(private usersService: UsersService) {}
   @Get()
   async getAllUsers(@Query() filter: FilterDto) {
     return this.usersService.getUsers(filter);
@@ -31,7 +29,12 @@ export class UsersController {
   @HttpCode(204)
   @Delete('/:id')
   async deleteUser(@Param('id') id: string) {
-    await this.usersService.deleteUser(id);
-    return;
+    return this.usersService.deleteUser(id);
+  }
+  //  this one is for testing only
+  @HttpCode(200)
+  @Get('/:id')
+  async getFullUser(@Param('id') id: string) {
+    return this.usersService.getFullUser(id);
   }
 }

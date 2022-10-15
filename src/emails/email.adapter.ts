@@ -6,6 +6,7 @@ import { ConfigService } from '@nestjs/config';
 export class EmailAdapter {
   constructor(private config: ConfigService) {}
   async sendEmail(email: string, subject: string, message: string) {
+    debugger;
     //  1) Create transport object
     let transport = nodemailer.createTransport({
       service: 'gmail',
@@ -23,7 +24,7 @@ export class EmailAdapter {
       subject: subject,
       html: message,
     });
-   
+    debugger;
     return info.accepted[0] === email;
   }
 }
