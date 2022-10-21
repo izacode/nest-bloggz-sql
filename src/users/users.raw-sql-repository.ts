@@ -23,8 +23,6 @@ export class UsersRawSqlRepository {
     refreshToken: string,
     _id: string,
   ): Promise<Boolean> {
-    console.log('result- checkRevokedTokensList', 'before');
-    debugger;
     const result = await this.dataSource.query(
       `
     SELECT token, "userId"
@@ -193,7 +191,6 @@ export class UsersRawSqlRepository {
   }
 
   async findUserByConfirmationCode(code: string): Promise<User | null> {
-    debugger;
     let user = await this.dataSource.query(
       `
     SELECT id, "expirationDate","isConfirmed"

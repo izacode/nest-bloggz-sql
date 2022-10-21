@@ -154,6 +154,7 @@ export class PostsRawSqlRepository {
   }
 
   async getPost(id: string, userInfo?: any): Promise<Post> {
+    debugger
     let post = await this.dataSource.query(
       `
     SELECT p.*, b.name 
@@ -215,16 +216,18 @@ export class PostsRawSqlRepository {
 
   // ============================= Get Post for reactioon=============================================================
   async getPostForReact(id: string, userInfo?: any): Promise<Post> {
+    debugger
     return this.getPost(id, userInfo);
   }
 
   async reactOnPost(reaction: PostReaction, post: any) {
+    debugger
     if (reaction.likeStatus === 'None') return;
     if (reaction.likeStatus === 'Like') {
       await this.dataSource.query(
         `
       UPDATE "Posts"
-      SET 'likesCount' +=1 
+      SET "likesCount" = "likesCount" + 1 
       WHERE id = $1
       `,
         [post.id],
@@ -233,7 +236,7 @@ export class PostsRawSqlRepository {
       await this.dataSource.query(
         `
       UPDATE "Posts"
-      SET 'dislikesCount' +=1 
+      SET "dislikesCount" = "dislikesCount" + 1 
        WHERE id = $1
       `,
         [post.id],
@@ -246,12 +249,13 @@ export class PostsRawSqlRepository {
     post: any,
     likeStatus: string,
   ) {
+    debugger
     if (likeStatus === 'Like') {
       if (currentUserPostReaction.likeStatus === 'Like') return;
       await this.dataSource.query(
         `
       UPDATE "Posts"
-      SET 'likesCount' +=1
+      SET "likesCount" = "likesCount" + 1
       WHERE id = $1
       `,
         [post.id],
@@ -261,7 +265,7 @@ export class PostsRawSqlRepository {
         await this.dataSource.query(
           `
       UPDATE "Posts"
-      SET 'dislikesCount' -=1
+      SET "dislikesCount" = "dislikesCount" - 1
       WHERE id = $1
       `,
           [post.id],
@@ -271,17 +275,17 @@ export class PostsRawSqlRepository {
       await this.dataSource.query(
         `
       UPDATE "Posts"
-      SET 'dislikesCount' +=1
+      SET "dislikesCount" = "dislikesCount" + 1
       WHERE id = $1
       `,
         [post.id],
       );
 
-      if (currentUserPostReaction.likeStatus === 'Dislike')
+      if (currentUserPostReaction.likeStatus === 'Like')
         await this.dataSource.query(
           `
       UPDATE "Posts"
-      SET 'likesCount' -=1
+      SET "likesCount" = "likesCount" - 1
       WHERE id = $1
       `,
           [post.id],
@@ -291,7 +295,7 @@ export class PostsRawSqlRepository {
         await this.dataSource.query(
           `
       UPDATE "Posts"
-      SET 'dislikesCount' -=1
+      SET "dislikesCount" = "dislikesCount" - 1
       WHERE id = $1
       `,
           [post.id],
@@ -301,7 +305,7 @@ export class PostsRawSqlRepository {
         await this.dataSource.query(
           `
       UPDATE "Posts"
-      SET 'likesCount' -=1
+      SET "likesCount" = "likesCount" - 1
       WHERE id = $1
       `,
           [post.id],
@@ -310,9 +314,9 @@ export class PostsRawSqlRepository {
     // Update PostReaction likeStatus
     await this.dataSource.query(
       `
-      UPDATE "PostsReactions"
-      SET 'likeStatus' = $1
-      WHERE 'userId' = $2 and 'postId' = $3
+      UPDATE public."PostsReacitons"
+      SET "likeStatus" = $1
+      WHERE "userId" = $2 and "postId" = $3
       `,
       [
         likeStatus,

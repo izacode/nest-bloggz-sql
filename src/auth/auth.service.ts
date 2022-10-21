@@ -34,7 +34,6 @@ export class AuthService {
       login,
       email,
     );
-    debugger;
     if (!isUserExists) throw new BadRequestException();
     const passwordHash = await this._generateHash(password);
     const user = {
@@ -126,7 +125,6 @@ export class AuthService {
 
     //  5-1) Trying to resend confirmatin email
     try {
-      debugger;
       const result = await this.emailService.sendEmailConfirmationMassage(
         updatedUser,
       );
@@ -151,7 +149,6 @@ export class AuthService {
   }
 
   async validateToken(token: string) {
-    debugger;
     let result: any;
     try {
       result = this.jwtService.verify(token, {

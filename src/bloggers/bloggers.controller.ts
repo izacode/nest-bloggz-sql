@@ -35,7 +35,7 @@ export class BloggersController {
     return this.bloggersService.getBloggers(filterDto);
   }
 
-  // @UseGuards(BasicAuthGuard)
+  @UseGuards(BasicAuthGuard)
   @Post()
   async createBlogger(@Body() createBloggerDto: CreateBloggerDto) {
     const newBlogger: Blogger = await this.bloggersService.createBlogger(
@@ -50,7 +50,7 @@ export class BloggersController {
     return foundBlogger;
   }
 
-  // @UseGuards(BasicAuthGuard)
+  @UseGuards(BasicAuthGuard)
   @Put('/:id')
   @HttpCode(204)
   async updateBlogger(
@@ -60,7 +60,7 @@ export class BloggersController {
     return this.bloggersService.updateBlogger(id, updateBloggerDto);
   }
 
-  // @UseGuards(BasicAuthGuard)
+  @UseGuards(BasicAuthGuard)
   @Delete('/:id')
   @HttpCode(204)
   async deleteBlogger(@Param('id') id: string) {
@@ -80,7 +80,7 @@ export class BloggersController {
     );
     return bloggerPosts;
   }
-  // @UseGuards(BasicAuthGuard)
+  @UseGuards(BasicAuthGuard)
   @Post('/:id/posts')
   @HttpCode(201)
   async createBloggerPost(

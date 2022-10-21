@@ -104,7 +104,7 @@ export class PostsService {
     likeStatusDto: LikeStatusDto,
     currentUserData: any,
   ) {
-  
+  debugger
     const { likeStatus } = likeStatusDto;
 
     let post = await this.postsRepository.getPostForReact(id);

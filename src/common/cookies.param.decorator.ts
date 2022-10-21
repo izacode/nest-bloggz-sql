@@ -6,7 +6,6 @@ import {
 
 export const Cookies = createParamDecorator(
   (data: string, ctx: ExecutionContext) => {
-    debugger;
     const request = ctx.switchToHttp().getRequest();
     let cookies = request.cookies;
     if (!cookies?.refreshToken || typeof cookies?.refreshToken !== 'string')

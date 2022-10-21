@@ -46,7 +46,6 @@ export class AuthController {
   @Post('/registration-email-resending')
   async resendConfirmaitionEmail(@Body() emailDto: EmailDto) {
     const result = await this.authService.resendConfirmaitionEmail(emailDto);
-    debugger;
     if (!result) throw new BadRequestException();
     return;
   }
@@ -101,7 +100,6 @@ export class AuthController {
     @Cookies('refreshToken') refreshToken: string,
     @Res({ passthrough: true }) response: Response,
   ) {
-    debugger;
     const { sub, username } = await this.authService.validateToken(
       refreshToken,
     );

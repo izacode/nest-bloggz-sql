@@ -27,6 +27,7 @@ export class ReactionsService {
     login: string,
     reactionStatus: LikeStatusDto,
   ) {
+    debugger
     const { likeStatus } = reactionStatus;
 
     const reaction = {

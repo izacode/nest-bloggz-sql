@@ -14,7 +14,6 @@ export class EmailManager {
     return info;
   }
   async sendEmailConfirmationMassage(user: User) {
-    debugger;
     // 1) Destructure email and confirmaitonCode from user
     let {
       emailConfirmation: { confirmationCode },
@@ -24,7 +23,6 @@ export class EmailManager {
     // 2) Create subject and message for Confifmation email
     const subject: string = 'This is email confirmation message';
     const message: string = `<H1> Please confirm your email <a href='https://somesite.com/confirm-email?code=${confirmationCode}'>confirm email <a/><H1/>`;
-    debugger;
     //  3) Pass it to emailAdapter(Nodemailer)
     const result = await this.emailAdapter.sendEmail(email, subject, message);
 

@@ -87,15 +87,16 @@ export class ReactionsRawSqlRepository {
     postId: string,
     userId: string,
   ): Promise<PostReaction | null> {
+    debugger
     const userPostReaction: PostReaction | null = await this.dataSource.query(
       `
-     SELECT "addedAt", "userId", login
+     SELECT "addedAt", "userId", login, "likeStatus", "postId"
      FROM public."PostsReacitons"
      WHERE "postId" = $1 AND "userId" = $2
     `,
       [postId, userId],
     );
-    console.log(userPostReaction);
+ 
     if (!userPostReaction) return null;
     return userPostReaction[0];
   }

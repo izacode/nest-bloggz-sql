@@ -35,7 +35,7 @@ export class PostsController {
     return this.postsService.getPosts(filterDto, headers);
   }
 
-  // @UseGuards(BasicAuthGuard)
+  @UseGuards(BasicAuthGuard)
   @Post()
   async createPost(@Body() createPostDto: CreatePostDto) {
     const createdPost = await this.postsService.createPost(createPostDto);
@@ -47,7 +47,7 @@ export class PostsController {
     return post;
   }
 
-  // @UseGuards(BasicAuthGuard)
+  @UseGuards(BasicAuthGuard)
   @Put('/:id')
   @HttpCode(204)
   async updatePost(
@@ -62,7 +62,7 @@ export class PostsController {
     return;
   }
 
-  // @UseGuards(BasicAuthGuard)
+  @UseGuards(BasicAuthGuard)
   @Delete('/:id')
   @HttpCode(204)
   async deletePost(@Param('id') id: string) {
@@ -111,7 +111,7 @@ export class PostsController {
     @Body() likeStatusDto: LikeStatusDto,
     @CurrentUserData() currentUserData: any,
   ) {
-    
+      debugger;
     await this.postsService.reactOnPost(id, likeStatusDto, currentUserData);
     return;
   }

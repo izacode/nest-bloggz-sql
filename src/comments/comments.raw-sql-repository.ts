@@ -29,7 +29,7 @@ export class CommentsRawSqlRepository {
       dislikesCount,
       myStatus,
     } = comment;
-    
+
     const mappedComment = {
       id,
       content,
@@ -48,11 +48,11 @@ export class CommentsRawSqlRepository {
   async getCommentById(id: string, userInfo?: any): Promise<Comment> {
     let comment = await this.dataSource.query(
       `
-    SELECT c*, u.userName as userLogin
-    FROM "Comments" as c
+    SELECT c.*, u."userName" as "userLogin"
+    FROM public."Comments" as c
+    JOIN public."Users" as u 
+    ON c."userId" = u.id 
     WHERE id = $1
-    JOIN "Users" as u 
-    ON c.userId = u.id 
     `,
       [id],
     );
@@ -113,9 +113,11 @@ export class CommentsRawSqlRepository {
 
     let postComments: Comment[] = await this.dataSource.query(
       `
-      SELECT *
-      FROM "Comments"
-      WHERE "postId" = $1
+      SELECT c.*, u."userName" as "userLogin"
+      FROM "Comments" as c
+      JOIN "Users" as u 
+      ON c."userId" = u.id
+      WHERE c."postId" = $1
       LIMIT $2 OFFSET $3
       `,
       [id, +PageSize, offset],
@@ -141,20 +143,22 @@ export class CommentsRawSqlRepository {
       });
     }
 
-    const totalCount: number = await this.dataSource.query(
-      `
+    const totalCount: number = +(
+      await this.dataSource.query(
+        `
     SELECT COUNT(*)
     FROM "Comments"
     WHERE "postId" = $1
     `,
-      [id],
-    );
+        [id],
+      )
+    )[0].count;
     const customResponse: CustomResponseType = {
       pagesCount: Math.ceil(totalCount / +PageSize),
       page: +PageNumber,
       pageSize: +PageSize,
       totalCount,
-      items: postComments,
+      items: mappedPostComments,
     };
     return customResponse;
   }
@@ -165,37 +169,46 @@ export class CommentsRawSqlRepository {
   ): Promise<boolean> {
     const { content } = updateCommentDto;
     await this.getCommentById(id);
-    await this.dataSource.query(`
+    await this.dataSource.query(
+      `
     UPDATE public."Comments"
 	  SET content= $1
 	  WHERE id = $2
-    `, [content, id]);
+    `,
+      [content, id],
+    );
     return true;
   }
 
   async deleteComment(id: string): Promise<boolean> {
     await this.getCommentById(id);
-    await this.dataSource.query(`
+    await this.dataSource.query(
+      `
     DELETE FROM public."Comments"
 	  WHERE id = $1;
-    `, [id]);
-    return true
+    `,
+      [id],
+    );
+    return true;
   }
 
   async getCommentByIdForReaction(
     id: string,
     userInfo?: any,
   ): Promise<Comment> {
-    return this.getCommentById(id); 
+    return this.getCommentById(id);
   }
 
   async reactOnComment(reaction: CommentReaction, comment: any) {
-      if (reaction.likeStatus === 'Like') {
-      await this.dataSource.query(`
+    if (reaction.likeStatus === 'Like') {
+      await this.dataSource.query(
+        `
       UPDATE public."Comments"
 	    SET  "likesCount" +=1
 	    WHERE id = $1
-      `, [comment.id]);
+      `,
+        [comment.id],
+      );
     } else if (reaction.likeStatus === 'Dislike') {
       await this.dataSource.query(
         `
@@ -206,10 +219,10 @@ export class CommentsRawSqlRepository {
         [comment.id],
       );
     }
-   
+
     return;
   }
-  
+
   async reactOnCommentAgain(
     currentUserCommentReaction: CommentReaction,
     comment: any,
@@ -226,24 +239,24 @@ export class CommentsRawSqlRepository {
         [comment.id],
       );
       if (currentUserCommentReaction.likeStatus === 'Dislike')
-         await this.dataSource.query(
-           `
+        await this.dataSource.query(
+          `
       UPDATE public."Comments"
 	    SET  "dislikesCount" -=1
 	    WHERE id = $1
       `,
-           [comment.id],
-         );
+          [comment.id],
+        );
     } else if (likeStatus === 'Dislike') {
       if (currentUserCommentReaction.likeStatus === 'Dislike') return;
-       await this.dataSource.query(
-         `
+      await this.dataSource.query(
+        `
       UPDATE public."Comments"
 	    SET  "dislikesCount" +=1
 	    WHERE id = $1
       `,
-         [comment.id],
-       );
+        [comment.id],
+      );
       if (currentUserCommentReaction.likeStatus === 'Like')
         await this.dataSource.query(
           `
@@ -273,7 +286,6 @@ export class CommentsRawSqlRepository {
       `,
           [comment.id],
         );
-      
     }
     await this.dataSource.query(
       `
