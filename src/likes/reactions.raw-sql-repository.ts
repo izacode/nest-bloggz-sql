@@ -14,17 +14,17 @@ export class ReactionsRawSqlRepository {
     commentId: string,
     userId: string,
   ): Promise<CommentReaction | null> {
-    const userCommentReaction: CommentReaction | null =
-      await this.dataSource.query(
-        `
+    debugger;
+    const userCommentReaction = await this.dataSource.query(
+      `
       SELECT "likeStatus", "userId", "commentId"
-	    FROM public."CommentsReactions";
+	    FROM public."CommentsReactions"
       WHERE "userId" = $1 and "commentId" = $2
       `,
-        [userId, commentId],
-      );
-    if (!userCommentReaction) return null;
-    return userCommentReaction;
+      [userId, commentId],
+    );
+    if (userCommentReaction.length === 0) return null;
+    return userCommentReaction[0];
   }
 
   async getUsersAllCommentsReactions(
@@ -60,7 +60,7 @@ export class ReactionsRawSqlRepository {
   async createPostReaction(reaction: any) {
     await this.dataSource.query(
       `
-    INSERT INTO public."PostsReacitons"
+    INSERT INTO  public."PostsReactions"
     ("addedAt", "userId", login, "postId", "likeStatus")
 	  VALUES ($1, $2, $3, $4, $5)
     `,
@@ -73,7 +73,7 @@ export class ReactionsRawSqlRepository {
     const lastThreeLikeReactions = await this.dataSource.query(
       `
      SELECT "addedAt", "userId", login
-     FROM public."PostsReacitons"
+     FROM  public."PostsReactions"
      WHERE "postId" = $1 AND "likeStatus" = 'Like'
      ORDER BY "addedAt" ASC
      LIMIT 3
@@ -87,16 +87,16 @@ export class ReactionsRawSqlRepository {
     postId: string,
     userId: string,
   ): Promise<PostReaction | null> {
-    debugger
+    debugger;
     const userPostReaction: PostReaction | null = await this.dataSource.query(
       `
      SELECT "addedAt", "userId", login, "likeStatus", "postId"
-     FROM public."PostsReacitons"
+     FROM  public."PostsReactions"
      WHERE "postId" = $1 AND "userId" = $2
     `,
       [postId, userId],
     );
- 
+
     if (!userPostReaction) return null;
     return userPostReaction[0];
   }
@@ -106,7 +106,7 @@ export class ReactionsRawSqlRepository {
       await this.dataSource.query(
         `
      SELECT "addedAt", "userId", login
-     FROM public."PostsReacitons"
+     FROM  public."PostsReactions"
      WHERE "userId" = $1
      ORDER BY "addedAt" ASC
      LIMIT 3

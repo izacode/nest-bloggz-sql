@@ -154,13 +154,13 @@ export class PostsRawSqlRepository {
   }
 
   async getPost(id: string, userInfo?: any): Promise<Post> {
-    debugger
+    debugger;
     let post = await this.dataSource.query(
       `
     SELECT p.*, b.name 
     FROM "Posts" as p
     LEFT JOIN bloggers as b ON p."bloggerId" = b.id 
-    LEFT JOIN public."PostsReacitons" as pr ON pr."postId" = $1 AND pr."userId" = $2 
+    LEFT JOIN  public."PostsReactions" as pr ON pr."postId" = $1 AND pr."userId" = $2 
     WHERE p.id = $1
     `,
       [id, userInfo?.sub],
@@ -216,12 +216,12 @@ export class PostsRawSqlRepository {
 
   // ============================= Get Post for reactioon=============================================================
   async getPostForReact(id: string, userInfo?: any): Promise<Post> {
-    debugger
+    debugger;
     return this.getPost(id, userInfo);
   }
 
   async reactOnPost(reaction: PostReaction, post: any) {
-    debugger
+    debugger;
     if (reaction.likeStatus === 'None') return;
     if (reaction.likeStatus === 'Like') {
       await this.dataSource.query(
@@ -249,7 +249,7 @@ export class PostsRawSqlRepository {
     post: any,
     likeStatus: string,
   ) {
-    debugger
+    debugger;
     if (likeStatus === 'Like') {
       if (currentUserPostReaction.likeStatus === 'Like') return;
       await this.dataSource.query(
@@ -314,7 +314,7 @@ export class PostsRawSqlRepository {
     // Update PostReaction likeStatus
     await this.dataSource.query(
       `
-      UPDATE public."PostsReacitons"
+      UPDATE  public."PostsReactions"
       SET "likeStatus" = $1
       WHERE "userId" = $2 and "postId" = $3
       `,

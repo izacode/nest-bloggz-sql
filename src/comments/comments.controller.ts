@@ -18,10 +18,12 @@ import { UpdateCommentDto } from './dto/update-comment.dto';
 @Controller('comments')
 export class CommentsController {
   constructor(private commentsService: CommentsService) {}
-  // @HttpCode(204)
+
+
   @Get('/:id')
   async getCommentById(@Headers() headers: any, @Param('id') id: string) {
     const comment = await this.commentsService.getCommentById(id, headers);
+    debugger;
     return comment;
   }
 

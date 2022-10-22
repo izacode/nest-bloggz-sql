@@ -46,19 +46,20 @@ export class CommentsRawSqlRepository {
   }
 
   async getCommentById(id: string, userInfo?: any): Promise<Comment> {
+    debugger;
     let comment = await this.dataSource.query(
       `
     SELECT c.*, u."userName" as "userLogin"
     FROM public."Comments" as c
     JOIN public."Users" as u 
     ON c."userId" = u.id 
-    WHERE id = $1
+    WHERE c.id = $1
     `,
       [id],
     );
-    if (!comment) throw new NotFoundException();
-    let mappedComment = this.commentMapper(comment);
-    let userCommentReaction: CommentReaction;
+    if (comment.length === 0) throw new NotFoundException();
+    let mappedComment = this.commentMapper(comment[0]);
+    let userCommentReaction: any;
     if (userInfo) {
       userCommentReaction =
         await this.reactionsRepository.getUsersCommentReaction(
@@ -66,6 +67,7 @@ export class CommentsRawSqlRepository {
           userInfo.sub,
         );
     }
+
     if (userCommentReaction)
       mappedComment.likesInfo.myStatus = userCommentReaction.likeStatus;
 
@@ -172,7 +174,7 @@ export class CommentsRawSqlRepository {
     await this.dataSource.query(
       `
     UPDATE public."Comments"
-	  SET content= $1
+	  SET content = $1
 	  WHERE id = $2
     `,
       [content, id],
@@ -204,7 +206,7 @@ export class CommentsRawSqlRepository {
       await this.dataSource.query(
         `
       UPDATE public."Comments"
-	    SET  "likesCount" +=1
+	    SET "likesCount" = "likesCount" + 1
 	    WHERE id = $1
       `,
         [comment.id],
@@ -213,7 +215,7 @@ export class CommentsRawSqlRepository {
       await this.dataSource.query(
         `
       UPDATE public."Comments"
-	    SET  "dislikesCount" +=1
+	    SET "dislikesCount" ="dislikesCount" + 1
 	    WHERE id = $1
       `,
         [comment.id],
@@ -233,7 +235,7 @@ export class CommentsRawSqlRepository {
       await this.dataSource.query(
         `
       UPDATE public."Comments"
-	    SET  "likesCount" +=1
+	    SET "likesCount" = "likesCount" + 1
 	    WHERE id = $1
       `,
         [comment.id],
@@ -242,7 +244,7 @@ export class CommentsRawSqlRepository {
         await this.dataSource.query(
           `
       UPDATE public."Comments"
-	    SET  "dislikesCount" -=1
+	    SET "dislikesCount" = "dislikesCount" - 1
 	    WHERE id = $1
       `,
           [comment.id],
@@ -252,7 +254,7 @@ export class CommentsRawSqlRepository {
       await this.dataSource.query(
         `
       UPDATE public."Comments"
-	    SET  "dislikesCount" +=1
+	    SET "dislikesCount" = "dislikesCount" + 1
 	    WHERE id = $1
       `,
         [comment.id],
@@ -261,7 +263,7 @@ export class CommentsRawSqlRepository {
         await this.dataSource.query(
           `
       UPDATE public."Comments"
-	    SET  "likesCount" -=1
+	    SET "likesCount" = "likesCount" - 1
 	    WHERE id = $1
       `,
           [comment.id],
@@ -271,7 +273,7 @@ export class CommentsRawSqlRepository {
         await this.dataSource.query(
           `
       UPDATE public."Comments"
-	    SET  "dislikesCount" +=1
+	    SET "dislikesCount" = "dislikesCount" + 1 
 	    WHERE id = $1
       `,
           [comment.id],
@@ -281,7 +283,7 @@ export class CommentsRawSqlRepository {
         await this.dataSource.query(
           `
       UPDATE public."Comments"
-	    SET  "likesCount" -=1
+	    SET "likesCount" = "likesCount" - 1
 	    WHERE id = $1
       `,
           [comment.id],
@@ -290,8 +292,8 @@ export class CommentsRawSqlRepository {
     await this.dataSource.query(
       `
     UPDATE public."CommentsReactions"
-	  SET "likeStatus"=$1
-	  WHERE "commentId" = $2 && userId = $3;
+	  SET "likeStatus" = $1
+	  WHERE "commentId" = $2 AND "userId" = $3;
     `,
       [likeStatus, comment.id, currentUserCommentReaction.userId],
     );

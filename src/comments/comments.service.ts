@@ -77,6 +77,7 @@ export class CommentsService {
 
       return this.commentsRepository.getCommentById(id, userInfo);
     } catch {
+      debugger
       return this.commentsRepository.getCommentById(id);
     }
   }
