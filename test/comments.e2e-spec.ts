@@ -9,6 +9,7 @@ let newPost;
 let newComment;
 let userId;
 let newUser;
+let forbidenUserAccessToken: string;
 
 function stripPostIdAndReturnNewComment(obj) {
   const { postId, ...rest } = obj;
@@ -253,7 +254,7 @@ describe('CommentsController (e2e)', () => {
     });
   });
 
-  // WITH REATION====================================================================================================
+  // WITH REACTION====================================================================================================
   describe('Getting comment by id with reation', () => {
     it('Should return 404 if comment doesnt exist ', async () => {
       return request(app.getHttpServer())
@@ -301,37 +302,133 @@ describe('CommentsController (e2e)', () => {
     });
   });
 
-  //   UPDATING UCOMMENT ============================================================================================================
+  //   ===========================REGISTERING USER for forbidden test =====================================================================================
+  describe('Register user', () => {
+    it('Should return created user, status 201 ', async () => {
+      return request(app.getHttpServer())
+        .post('/users')
+        .send({
+          login: 'user-7',
+          email: 'user7@user.com',
+          password: '123456',
+        })
+        .expect(201)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            id: body.id,
+            login: 'user-7',
+          });
+        });
+    });
+  });
+  //  ========================LOGIN USER  for forbidden test ==========================================================================================
+  describe('Login user in', () => {
+    it('should return 200 and pair of access and refresh tokens', async () => {
+      return request(app.getHttpServer())
+        .post('/auth/login')
+        .send({
+          login: 'user-7',
+          password: '123456',
+        })
+        .expect(200)
+        .then(({ body }) => {
+          forbidenUserAccessToken = body.accessToken;
+          expect(body).toEqual({
+            accessToken: expect.any(String),
+            refreshToken: expect.any(String),
+          });
+        });
+    });
+  });
 
-  // describe('Updating comment', () => {
-  //   describe('without PageNumber and without PageSize', () => {
-  //     it('Should return array of all users status 200 ', async () => {
-  //       return request(app.getHttpServer())
-  //         .get(`/comments/${newComment.id}`)
-  //         .expect(200)
-  //         .then(({ body }) => {
-  //           expect(body).toEqual({
-  //             ...customResponse,
-  //             items: [newUser],
-  //           });
-  //         });
-  //     });
-  //   });
-  // });
+  //   UPDATING COMMENT ============================================================================================================
+
+  describe('Updating comment', () => {
+    it('Should return 404 if comment doesnt exist ', async () => {
+      return request(app.getHttpServer())
+        .put(`/comments/1111111111111`)
+        .set('Authorization', 'bearer ' + accessToken)
+        .send({ content: 'this is updated comment for tests' })
+        .expect(404);
+    });
+    it('Should return 401 user is unauthorized ', async () => {
+      return request(app.getHttpServer())
+        .put(`/comments/${newComment.id}`)
+        .set('Authorization', 'bearer ' + 'accessToken')
+        .send({ content: 'this is updated comment for tests' })
+        .expect(401);
+    });
+    it('Should return 400 if input model has incorrect value ', async () => {
+      return request(app.getHttpServer())
+        .put(`/comments/${newComment.id}`)
+        .set('Authorization', 'bearer ' + accessToken)
+        .send({ content: '' })
+        .expect(400);
+    });
+
+    it('Should return 403 if comment doesnt belong to this user ', async () => {
+      return request(app.getHttpServer())
+        .put(`/comments/${newComment.id}`)
+        .set('Authorization', 'bearer ' + forbidenUserAccessToken)
+        .send({ content: 'this is updated comment for tests' })
+        .expect(403);
+    });
+    it('Should return 204', async () => {
+      return request(app.getHttpServer())
+        .put(`/comments/${newComment.id}`)
+        .set('Authorization', 'bearer ' + accessToken)
+        .send({ content: 'this is updated comment for tests' })
+        .expect(204);
+    });
+    it('Should return 200 and comment --- with auth', async () => {
+      return request(app.getHttpServer())
+        .get(`/comments/${newComment.id}`)
+        .set('Authorization', 'bearer ' + accessToken)
+        .expect(200)
+        .then(({ body }) => {
+          expect(body).toEqual({
+            id: newComment.id,
+            content: 'this is updated comment for tests',
+            userId,
+            addedAt: expect.any(String),
+            userLogin: 'user-6',
+            likesInfo: {
+              likesCount: 0,
+              dislikesCount: 1,
+              myStatus: 'Dislike',
+            },
+          });
+        });
+    });
+  });
 
   //   DELETING COMMENT ============================================================================================================
 
-  // describe('Delete comment', () => {
-  //   it('Should return 404, if comment doesnt exist ', async () => {
-  //     return request(app.getHttpServer())
-  //       .delete(`/comment/18c5de8c-8f8c-4de9-b1dd-a6b4f76b5dfb`)
-  //       .expect(404);
-  //   });
+  describe('Delete comment', () => {
+    it('Should return 404, if comment doesnt exist ', async () => {
+      return request(app.getHttpServer())
+        .delete(`/comments/18c5de8c-8f8c-4de9-b1dd-a6b4f76b5dfb`)
+        .set('Authorization', 'bearer ' + accessToken)
+        .expect(404);
+    });
+    it('Should return 401 if user is unauthorized ', async () => {
+      return request(app.getHttpServer())
+        .delete(`/comments/${newComment.id}`)
+        .set('Authorization', 'bearer ' + 'unauthorized')
+        .expect(401);
+    });
+    it('Should return 403 if comment doesnt belong to this user ', async () => {
+      return request(app.getHttpServer())
+        .delete(`/comments/${newComment.id}`)
+        .set('Authorization', 'bearer ' + forbidenUserAccessToken)
+        .expect(403);
+    });
 
-  //   it('Should delete a comment by id ,return status 204 ', async () => {
-  //     return request(app.getHttpServer())
-  //       .delete(`/users/${newComment.id}`)
-  //       .expect(204);
-  //   });
-  // });
+    it('Should delete a comment by id ,return status 204 ', async () => {
+      return request(app.getHttpServer())
+        .delete(`/comments/${newComment.id}`)
+        .set('Authorization', 'bearer ' + accessToken)
+        .expect(204);
+    });
+  });
 });

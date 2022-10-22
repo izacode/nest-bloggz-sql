@@ -9,7 +9,6 @@ export class TestingClearController {
   @Delete('/all-data')
   @HttpCode(204)
   async clearDB() {
-    await this.testingService.clearDB();
-    return;
+    return this.testingService.clearDB();
   }
 }

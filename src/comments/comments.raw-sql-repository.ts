@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { UpdateCommentDto } from './dto/update-comment.dto';
@@ -168,9 +172,12 @@ export class CommentsRawSqlRepository {
   async updateComment(
     id: string,
     updateCommentDto: UpdateCommentDto,
+    username: string,
   ): Promise<boolean> {
     const { content } = updateCommentDto;
-    await this.getCommentById(id);
+    const commentToUpdate = await this.getCommentById(id);
+    if (commentToUpdate.userLogin !== username) throw new ForbiddenException();
+
     await this.dataSource.query(
       `
     UPDATE public."Comments"
@@ -182,8 +189,9 @@ export class CommentsRawSqlRepository {
     return true;
   }
 
-  async deleteComment(id: string): Promise<boolean> {
-    await this.getCommentById(id);
+  async deleteComment(id: string, username: string): Promise<boolean> {
+    const commentToDelete = await this.getCommentById(id);
+    if (commentToDelete.userLogin !== username) throw new ForbiddenException();
     await this.dataSource.query(
       `
     DELETE FROM public."Comments"

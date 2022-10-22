@@ -31,7 +31,6 @@ export class UsersRawSqlRepository {
     `,
       [refreshToken, _id],
     );
-    console.log('result- checkRevokedTokensList', result);
 
     return result[0] ? true : false;
   }

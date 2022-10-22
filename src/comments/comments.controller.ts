@@ -19,31 +19,37 @@ import { UpdateCommentDto } from './dto/update-comment.dto';
 export class CommentsController {
   constructor(private commentsService: CommentsService) {}
 
-
   @Get('/:id')
   async getCommentById(@Headers() headers: any, @Param('id') id: string) {
     const comment = await this.commentsService.getCommentById(id, headers);
     debugger;
     return comment;
   }
-
+  @HttpCode(204)
   @UseGuards(JwtAuthGuard)
   @Put('/:id')
   async updateComment(
+    @CurrentUserData() currentUserData: any,
     @Param('id') id: string,
     @Body() updateCommentDto: UpdateCommentDto,
   ) {
+    const { username } = currentUserData;
     const isUpdated = await this.commentsService.updateComment(
       id,
       updateCommentDto,
+      username,
     );
     return isUpdated;
   }
-
+  @HttpCode(204)
   @UseGuards(JwtAuthGuard)
   @Delete('/:id')
-  async deleteComment(@Param('id') id: string) {
-    const isDeleted = await this.commentsService.deleteComment(id);
+  async deleteComment(
+    @CurrentUserData() currentUserData: any,
+    @Param('id') id: string,
+  ) {
+    const { username } = currentUserData;
+    const isDeleted = await this.commentsService.deleteComment(id, username);
     return isDeleted;
   }
 

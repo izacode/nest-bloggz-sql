@@ -37,6 +37,7 @@ export class UsersService {
     return this.usersRepository.getUserById(id);
   }
 
+
   async deleteUser(id: string) {
     // const _id = new mongoose.Types.ObjectId(id);
     // return this.usersRepository.deleteUser(_id);

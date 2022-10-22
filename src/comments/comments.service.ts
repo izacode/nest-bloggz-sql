@@ -77,17 +77,25 @@ export class CommentsService {
 
       return this.commentsRepository.getCommentById(id, userInfo);
     } catch {
-      debugger
+      debugger;
       return this.commentsRepository.getCommentById(id);
     }
   }
 
-  async updateComment(id: string, updateCommentDto: UpdateCommentDto) {
-    return this.commentsRepository.updateComment(id, updateCommentDto);
+  async updateComment(
+    id: string,
+    updateCommentDto: UpdateCommentDto,
+    username: string,
+  ) {
+    return this.commentsRepository.updateComment(
+      id,
+      updateCommentDto,
+      username,
+    );
   }
 
-  async deleteComment(id: string): Promise<boolean> {
-    return this.commentsRepository.deleteComment(id);
+  async deleteComment(id: string, username: string): Promise<boolean> {
+    return this.commentsRepository.deleteComment(id, username);
   }
 
   async reactOnComment(
