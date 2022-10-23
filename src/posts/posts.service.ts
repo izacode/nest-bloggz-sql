@@ -4,7 +4,7 @@ import { FilterDto } from '../dto/filter.dto';
 import { ExtendedLikesInfo, Post } from '../schemas/post.schema';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { PostsRepository } from './posts.repository';
+// import { PostsRepository } from './posts.repository';
 import { BloggersRepository } from '../bloggers/bloggers.repository';
 import { Blogger } from '../schemas/blogger.schema';
 import { JwtService } from '@nestjs/jwt';
@@ -47,10 +47,10 @@ export class PostsService {
     id?: string,
   ): Promise<Post | null> {
     const { title, shortDescription, content } = createPostDto;
-    const bloggerId: string = id || createPostDto.bloggerId;
+    const blogId: string = id || createPostDto.blogId;
 
     const blogger: Blogger = await this.bloggersRepository.getBlogger(
-      bloggerId,
+      blogId,
     );
 
     if (!blogger) throw new NotFoundException();
@@ -60,15 +60,15 @@ export class PostsService {
       title,
       shortDescription,
       content,
-      bloggerId,
-      bloggerName: blogger.name,
+      blogId,
+      blogName: blogger.name,
       createdAt: new Date().toISOString(),
-      extendedLikesInfo: {
-        likesCount: 0,
-        dislikesCount: 0,
-        myStatus: 'None',
-        newestLikes: [],
-      } as ExtendedLikesInfo,
+      // extendedLikesInfo: {
+      //   likesCount: 0,
+      //   dislikesCount: 0,
+      //   myStatus: 'None',
+      //   newestLikes: [],
+      // } as ExtendedLikesInfo,
     } as Post;
 
     return this.postsRepository.createPost(newPost);

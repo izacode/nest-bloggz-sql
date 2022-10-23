@@ -12,17 +12,45 @@ export class BloggersRawSqlRepository {
   constructor(@InjectDataSource() protected dataSource: DataSource) {}
 
   async getBloggers(filterDto: FilterDto): Promise<CustomResponseType> {
-    const { SearchNameTerm, PageNumber, PageSize } = filterDto;
+    const { SearchNameTerm, PageNumber, PageSize, sortBy, sortDirection } =
+      filterDto;
+    console.log(sortDirection);
     const offset = (+PageNumber - 1) * +PageSize || 0;
-    const bloggers = await this.dataSource.query(
-      `
-     SELECT id, name, "youtubeUrl"
+    let bloggers:  Blogger[]
+    // let bloggers =  await this.dataSource.query(
+    //     `
+    //  SELECT id, name, "youtubeUrl", "createdAt"
+    //  FROM bloggers
+    //  WHERE name LIKE ('%'||$1||'%')
+    //  ORDER BY $4 [$5]
+    //  LIMIT $2 OFFSET $3
+    // `,
+    //     [SearchNameTerm, PageSize, offset, sortBy, sortDirection],
+    //   );;
+
+    if (sortDirection === 'DESC') {
+      bloggers = await this.dataSource.query(
+        `
+     SELECT id, name, "youtubeUrl", "createdAt"
      FROM bloggers
-     WHERE bloggers.name LIKE ('%'||$1||'%') 
+     WHERE name LIKE ('%'||$1||'%')
+     ORDER BY $4 DESC
      LIMIT $2 OFFSET $3
     `,
-      [SearchNameTerm, PageSize, offset],
-    );
+        [SearchNameTerm, PageSize, offset, sortBy],
+      );
+    } else {
+      bloggers = await this.dataSource.query(
+        `
+     SELECT id, name, "youtubeUrl", "createdAt"
+     FROM bloggers
+     WHERE name LIKE ('%'||$1||'%')
+     ORDER BY $4 ASC
+     LIMIT $2 OFFSET $3
+    `,
+        [SearchNameTerm, PageSize, offset, sortBy],
+      );
+    }
 
     const totalCount: number = +(
       await this.dataSource.query(`
@@ -42,20 +70,24 @@ export class BloggersRawSqlRepository {
   }
 
   async createBlogger(newBlogger: CreateBloggerDto): Promise<Blogger> {
-    const { id, name, youtubeUrl } = newBlogger;
+    const { id, name, youtubeUrl, createdAt } = newBlogger;
     await this.dataSource.query(
       `
-    INSERT INTO public.bloggers ("id", "name", "youtubeUrl")
-	  VALUES ($1, $2, $3)`,
-      [id, name, youtubeUrl],
+    INSERT INTO public.bloggers ("id", "name", "youtubeUrl", "createdAt")
+	  VALUES ($1, $2, $3, $4)`,
+      [id, name, youtubeUrl, createdAt],
     );
-    return newBlogger as Blogger;
+
+    let bloggerToReturn = await this.getBlogger(id);
+    bloggerToReturn.createdAt = createdAt;
+
+    return bloggerToReturn;
   }
 
   async getBlogger(id: string): Promise<Blogger> {
     const foundBlogger = await this.dataSource.query(
       `
-    SELECT id, name, "youtubeUrl"
+    SELECT id, name, "youtubeUrl", "createdAt"
 	  FROM "bloggers"
     WHERE id = $1`,
       [id],

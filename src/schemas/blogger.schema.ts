@@ -9,6 +9,8 @@ export class Blogger extends Document {
     name: string;
     @Prop()
     youtubeUrl: string
+    @Prop()
+    createdAt: string
 }
 
 export const BloggerSchema = SchemaFactory.createForClass(Blogger)

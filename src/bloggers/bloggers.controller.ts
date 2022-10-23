@@ -21,7 +21,7 @@ import { CreatePostDto } from '../posts/dto/create-post.dto';
 import { PostsService } from '../posts/posts.service';
 import { BasicAuthGuard } from '../auth/guards/basic-auth-guard';
 
-@Controller('bloggers')
+@Controller('blogs')
 export class BloggersController {
   constructor(
     protected bloggersService: BloggersService,

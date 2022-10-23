@@ -19,4 +19,5 @@ export class CreateBloggerDto {
   @MaxLength(100)
   @Matches(/^https:\/\/([\w-]+\.)+[\w-]+(\/[\w-]+)*\/?$/)
   youtubeUrl: string;
+  createdAt: string
 }

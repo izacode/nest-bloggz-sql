@@ -28,13 +28,13 @@ export class Post extends Document {
   @Prop()
   content: string;
   @Prop()
-  bloggerId: string;
+  blogId: string;
   @Prop()
-  bloggerName: string;
+  blogName: string;
   @Prop()
   createdAt: string;
-  @Prop({ type: ExtendedLikesInfoSchema })
-  extendedLikesInfo: ExtendedLikesInfo;
+  // @Prop({ type: ExtendedLikesInfoSchema })
+  // extendedLikesInfo: ExtendedLikesInfo;
 }
 
 export const PostSchema = SchemaFactory.createForClass(Post);

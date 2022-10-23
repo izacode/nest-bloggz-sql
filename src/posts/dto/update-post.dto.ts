@@ -12,5 +12,5 @@ export class UpdatePostDto {
   content: string;
   @IsNotEmpty()
   @IsString()
-  bloggerId: string;
+  blogId: string;
 }

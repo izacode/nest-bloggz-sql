@@ -69,7 +69,7 @@ describe('PostsController (e2e)', () => {
             title: 'some title',
             shortDescription: 'some description',
             content: 'some content',
-            bloggerId: 'string',
+            blogId: 'string',
           })
           .expect(401);
       });
@@ -81,7 +81,7 @@ describe('PostsController (e2e)', () => {
             title: '',
             shortDescription: 'some description',
             content: 'some content',
-            bloggerId: 'string',
+            blogId: 'string',
           })
           .expect(400);
       });
@@ -93,7 +93,7 @@ describe('PostsController (e2e)', () => {
             title: 'some title',
             shortDescription: '',
             content: 'some content',
-            bloggerId: 'string',
+            blogId: 'string',
           })
           .expect(400);
       });
@@ -105,7 +105,7 @@ describe('PostsController (e2e)', () => {
             title: 'some title',
             shortDescription: 'some description',
             content: '',
-            bloggerId: 'string',
+            blogId: 'string',
           })
           .expect(400);
       });
@@ -117,7 +117,7 @@ describe('PostsController (e2e)', () => {
             title: 'some title',
             shortDescription: 'some description',
             content: 'some content',
-            bloggerId: '',
+            blogId: '',
           })
           .expect(400);
       });
@@ -129,7 +129,7 @@ describe('PostsController (e2e)', () => {
             title: 'some title',
             shortDescription: 'some description',
             content: 'some content',
-            bloggerId: '11111111111111',
+            blogId: '11111111111111',
           })
           .expect(404);
       });
@@ -141,7 +141,7 @@ describe('PostsController (e2e)', () => {
             title: 'some title',
             shortDescription: 'some description',
             content: 'some content',
-            bloggerId: blogger.id,
+            blogId: blogger.id,
           })
           .expect(201)
           .then(({ body }) => {
@@ -154,8 +154,8 @@ describe('PostsController (e2e)', () => {
               title: 'some title',
               shortDescription: 'some description',
               content: 'some content',
-              bloggerId: blogger.id,
-              bloggerName: expect.any(String),
+              blogId: blogger.id,
+              blogName: expect.any(String),
               createdAt: expect.any(String),
               extendedLikesInfo: {
                 likesCount: 0,
@@ -197,7 +197,7 @@ describe('PostsController (e2e)', () => {
           title: 'some title',
           shortDescription: 'some description',
           content: 'some content',
-          bloggerId: '11111111111111',
+          blogId: '11111111111111',
         })
         .expect(401);
     });
@@ -209,7 +209,7 @@ describe('PostsController (e2e)', () => {
           title: 'some title',
           shortDescription: 'some description',
           content: 'some content',
-          bloggerId: '11111111111111',
+          blogId: '11111111111111',
         })
         .expect(404);
     });
@@ -221,7 +221,7 @@ describe('PostsController (e2e)', () => {
           title: '',
           shortDescription: 'some description',
           content: 'some content',
-          bloggerId: blogger.id,
+          blogId: blogger.id,
         })
         .expect(400);
     });
@@ -233,7 +233,7 @@ describe('PostsController (e2e)', () => {
           title: 'some title',
           shortDescription: '',
           content: 'some content',
-          bloggerId: blogger.id,
+          blogId: blogger.id,
         })
         .expect(400);
     });
@@ -245,7 +245,7 @@ describe('PostsController (e2e)', () => {
           title: 'some title',
           shortDescription: 'some description',
           content: '',
-          bloggerId: blogger.id,
+          blogId: blogger.id,
         })
         .expect(400);
     });
@@ -257,7 +257,7 @@ describe('PostsController (e2e)', () => {
           title: 'some title',
           shortDescription: 'some description',
           content: 'some content',
-          bloggerId: '',
+          blogId: '',
         })
         .expect(400);
     });
@@ -269,7 +269,7 @@ describe('PostsController (e2e)', () => {
           title: 'some title',
           shortDescription: 'some description',
           content: 'some content',
-          bloggerId: blogger.id,
+          blogId: blogger.id,
         })
         .expect(HttpStatus.NO_CONTENT);
     });
