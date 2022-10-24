@@ -89,14 +89,4 @@ import { TestingClearService } from './testing/testing-clear.service';
   //   TestingClearService,
   // ],
 })
-export class AppModule {
-  // configure(consumer: MiddlewareConsumer) {
-  //   consumer
-  //     .apply(logger)
-  //     .exclude(
-  //       { path: 'comments/:id', method: RequestMethod.PUT },
-  //       { path: 'comments/:id', method: RequestMethod.DELETE },
-  //     )
-  //     .forRoutes(CommentsController);
-  // }
-}
+export class AppModule {}
