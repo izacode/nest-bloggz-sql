@@ -2,11 +2,10 @@ import { Injectable } from '@nestjs/common';
 
 import { CustomResponseType } from '../types';
 
-
 import { CreateBloggerDto } from './dto/create-blogger.dto';
 import { FilterDto } from '../dto/filter.dto';
 import { UpdateBloggerDto } from './dto/update-blogger.dto';
-import { validateOrReject } from 'class-validator';
+
 import { BloggersRawSqlRepository } from './bloggers.raw-sql-repository';
 
 @Injectable()
@@ -24,6 +23,7 @@ export class BloggersService {
       id: (+new Date()).toString(),
       name,
       youtubeUrl,
+      createdAt: new Date().toISOString()
     };
 
     return this.bloggersRepository.createBlogger(newBlogger);
