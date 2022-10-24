@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 import { Blogger } from '../schemas/blogger.schema';
 import { ExtendedLikesInfo, Post } from '../schemas/post.schema';
 import { CustomResponseType } from '../types';
