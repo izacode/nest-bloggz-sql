@@ -1,12 +1,10 @@
 import { Injectable } from '@nestjs/common';
-
 import { CustomResponseType } from '../types';
-
 import { CreateBloggerDto } from './dto/create-blogger.dto';
 import { FilterDto } from '../dto/filter.dto';
 import { UpdateBloggerDto } from './dto/update-blogger.dto';
-
 import { BloggersRawSqlRepository } from './bloggers.raw-sql-repository';
+
 
 @Injectable()
 export class BloggersService {
@@ -17,10 +15,10 @@ export class BloggersService {
   }
 
   async createBlogger(createBloggerDto: CreateBloggerDto) {
+    debugger
     // await validateOrReject(createBloggerDto);
     const { name, youtubeUrl } = createBloggerDto;
-    const newBlogger = {
-      id: (+new Date()).toString(),
+    const newBlogger: any = {
       name,
       youtubeUrl,
       createdAt: new Date().toISOString()

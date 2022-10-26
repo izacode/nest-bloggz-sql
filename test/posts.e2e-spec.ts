@@ -56,6 +56,7 @@ describe('PostsController (e2e)', () => {
             id: expect.any(String),
             name: 'Alex',
             youtubeUrl: 'https://www.youtube.com',
+            createdAt: expect.any(String),
           });
         });
     });

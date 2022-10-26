@@ -25,6 +25,7 @@ export class CommentsController {
     debugger;
     return comment;
   }
+
   @HttpCode(204)
   @UseGuards(JwtAuthGuard)
   @Put('/:id')
@@ -41,6 +42,7 @@ export class CommentsController {
     );
     return isUpdated;
   }
+  
   @HttpCode(204)
   @UseGuards(JwtAuthGuard)
   @Delete('/:id')

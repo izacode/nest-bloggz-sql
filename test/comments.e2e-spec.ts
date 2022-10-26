@@ -49,6 +49,7 @@ describe('CommentsController (e2e)', () => {
             id: expect.any(String),
             name: 'Alex',
             youtubeUrl: 'https://www.youtube.com',
+            createdAt: expect.any(String),
           });
         });
     });
@@ -68,7 +69,7 @@ describe('CommentsController (e2e)', () => {
         .then(({ body }) => {
           postId = body.id;
           newPost = body;
-
+          console.log('body of post in comments----', body);
           expect(body).toEqual({
             id: postId,
             title: 'some title',

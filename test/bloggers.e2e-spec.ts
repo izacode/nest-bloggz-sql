@@ -76,6 +76,7 @@ describe('BloggersController (e2e)', () => {
             id: expect.any(String),
             name: 'Alex',
             youtubeUrl: 'https://www.youtube.com',
+            createdAt: expect.any(String),
           });
         });
       // const res = await request(app.getHttpServer()).post('/bloggers').send(bloggerAlex)
@@ -103,7 +104,11 @@ describe('BloggersController (e2e)', () => {
         .get(`/bloggers/${bloggerId}`)
         .expect(200)
         .then(({ body }) => {
-          expect(body).toEqual({ id: bloggerId, ...bloggerAlex });
+          expect(body).toEqual({
+            id: bloggerId,
+            createdAt: expect.any(String),
+            ...bloggerAlex,
+          });
         });
     });
 
@@ -178,7 +183,13 @@ describe('BloggersController (e2e)', () => {
           .then(({ body }) => {
             expect(body).toEqual({
               ...customResponse,
-              items: [{ ...bloggerUpdated, id: bloggerId }],
+              items: [
+                {
+                  ...bloggerUpdated,
+                  id: bloggerId,
+                  createdAt: expect.any(String),
+                },
+              ],
             });
           });
       });
@@ -207,7 +218,13 @@ describe('BloggersController (e2e)', () => {
           .then(({ body }) => {
             expect(body).toEqual({
               ...customResponse,
-              items: [{ ...bloggerUpdated, id: bloggerId }],
+              items: [
+                {
+                  ...bloggerUpdated,
+                  id: bloggerId,
+                  createdAt: expect.any(String),
+                },
+              ],
             });
           });
       });

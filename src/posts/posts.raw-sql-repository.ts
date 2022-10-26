@@ -1,16 +1,18 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Blogger } from '../schemas/blogger.schema';
-import { ExtendedLikesInfo, Post } from '../schemas/post.schema';
+
 import { CustomResponseType } from '../types';
 import { CreatePostDto } from './dto/create-post.dto';
 import { FilterDto } from '../dto/filter.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { ReactionsRepository } from '../likes/reactions.repository';
-import { PostReaction } from 'src/schemas/post-reaction.schema';
+
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { ReactionsRawSqlRepository } from '../likes/reactions.raw-sql-repository';
+import { Post } from './post.entity';
+import { PostReaction } from '../likes/entities/post-reaction.entity';
 
 @Injectable()
 export class PostsRawSqlRepository {
@@ -26,7 +28,7 @@ export class PostsRawSqlRepository {
       shortDescription,
       content,
       bloggerId,
-      name,
+      bloggerName,
       createdAt,
       likesCount,
       dislikesCount,
@@ -39,7 +41,7 @@ export class PostsRawSqlRepository {
       content,
       createdAt,
       bloggerId,
-      bloggerName: name,
+      bloggerName,
       extendedLikesInfo: {
         likesCount,
         dislikesCount,
@@ -129,27 +131,45 @@ export class PostsRawSqlRepository {
   }
 
   async createPost(newPost: Post): Promise<Post | null> {
-    const { id, title, shortDescription, content, bloggerId, createdAt } =
-      newPost;
+    const {
+      title,
+      shortDescription,
+      content,
+      bloggerId,
+      bloggerName,
+      createdAt,
+      likesCount,
+      dislikesCount,
+      myStatus,
+    } = newPost;
     await this.dataSource.query(
       `
    INSERT INTO public."Posts"( 
-	 id, title, "shortDescription", content, "bloggerId", "createdAt", "likesCount", "dislikesCount", "myStatus")
+	 title, "shortDescription", content, "bloggerId", "bloggerName", "createdAt", "likesCount", "dislikesCount", "myStatus")
 	 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);
    `,
       [
-        id,
         title,
         shortDescription,
         content,
         bloggerId,
+        bloggerName,
         createdAt,
-        0,
-        0,
-        'None',
+        likesCount,
+        dislikesCount,
+        myStatus,
       ],
     );
-    return newPost as Post;
+
+    let createdPost: Post = await this.dataSource.query(
+      `
+    SELECT *
+    FROM public."Posts"
+    WHERE title = $1
+    `,
+      [title],
+    );
+    return this.postMapper(createdPost[0]) as any;
   }
 
   async getPost(id: string, userInfo?: any): Promise<Post> {
@@ -185,7 +205,7 @@ export class PostsRawSqlRepository {
       await this.reactionsRawSqlRepository.getLastThreePostLikeReactions(id);
     mappedPost.extendedLikesInfo.newestLikes = lastThreePostLikeReactions;
 
-    return mappedPost as Post;
+    return mappedPost as any;
   }
 
   async updatePost(id: string, updatePostDto: UpdatePostDto): Promise<boolean> {

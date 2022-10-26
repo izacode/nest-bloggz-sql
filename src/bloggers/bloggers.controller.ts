@@ -11,7 +11,7 @@ import {
   UseGuards,
   Headers,
 } from '@nestjs/common';
-import { Blogger } from '../schemas/blogger.schema';
+
 import { CustomResponseType } from 'src/types';
 import { BloggersService } from './bloggers.service';
 import { CreateBloggerDto } from './dto/create-blogger.dto';
@@ -20,6 +20,7 @@ import { UpdateBloggerDto } from './dto/update-blogger.dto';
 import { CreatePostDto } from '../posts/dto/create-post.dto';
 import { PostsService } from '../posts/posts.service';
 import { BasicAuthGuard } from '../auth/guards/basic-auth-guard';
+import { Blogger } from './blogger.entity';
 
 @Controller('bloggers')
 export class BloggersController {

@@ -3,10 +3,6 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
-import { ObjectId } from 'mongodb';
-
 import { FilterDto } from '../dto/filter.dto';
 import { CustomResponseType } from 'src/types';
 import { User } from '../schemas/user.schema';

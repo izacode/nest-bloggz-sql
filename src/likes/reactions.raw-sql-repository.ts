@@ -3,8 +3,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { Model } from 'mongoose';
 import { DataSource } from 'typeorm';
-import { CommentReaction } from '../schemas/comment-reaction.schema';
-import { PostReaction } from '../schemas/post-reaction.schema';
+import { CommentReaction } from './entities/comment-reaction.entity';
+import { PostReaction } from './entities/post-reaction.entity';
+
 
 @Injectable()
 export class ReactionsRawSqlRepository {
@@ -98,7 +99,7 @@ export class ReactionsRawSqlRepository {
     );
 
     if (!userPostReaction) return null;
-    return userPostReaction[0];
+    return userPostReaction[0] as PostReaction;
   }
 
   async getUserAllPostsReactions(id: string) {

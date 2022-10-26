@@ -6,7 +6,7 @@ import { Blogger, BloggerSchema } from '../schemas/blogger.schema';
 import { Comment, CommentSchema } from '../schemas/comment.schema';
 import { Post, PostSchema } from '../schemas/post.schema';
 import { PostsController } from './posts.controller';
-import { PostsRepository } from './posts.repository';
+
 import { PostsService } from './posts.service';
 import { forwardRef } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';

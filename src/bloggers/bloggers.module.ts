@@ -9,7 +9,7 @@ import { PostsService } from '../posts/posts.service';
 
 import { BloggersController } from './bloggers.controller';
 import { BloggersRawSqlRepository } from './bloggers.raw-sql-repository';
-import { BloggersRepository } from './bloggers.repository';
+
 import { BloggersService } from './bloggers.service';
 
 @Module({

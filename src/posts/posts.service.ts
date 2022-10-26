@@ -1,21 +1,23 @@
-import { ConsoleLogger, Injectable, NotFoundException } from '@nestjs/common';
+import {  Injectable, NotFoundException } from '@nestjs/common';
 import { FilterDto } from '../dto/filter.dto';
 
-import { ExtendedLikesInfo, Post } from '../schemas/post.schema';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { PostsRepository } from './posts.repository';
-import { BloggersRepository } from '../bloggers/bloggers.repository';
-import { Blogger } from '../schemas/blogger.schema';
+
+
+
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { LikeStatusDto } from '../dto/like-status.dto';
 import { ReactionsRepository } from '../likes/reactions.repository';
 import { ReactionsService } from '../likes/reactions.service';
-import { PostReaction } from 'src/schemas/post-reaction.schema';
+
 import { PostsRawSqlRepository } from './posts.raw-sql-repository';
 import { ReactionsRawSqlRepository } from '../likes/reactions.raw-sql-repository';
 import { BloggersRawSqlRepository } from '../bloggers/bloggers.raw-sql-repository';
+import { Post } from './post.entity';
+import { Blogger } from 'src/bloggers/blogger.entity';
+import { PostReaction } from '../likes/entities/post-reaction.entity';
 
 @Injectable()
 export class PostsService {
@@ -56,19 +58,15 @@ export class PostsService {
     if (!blogger) throw new NotFoundException();
 
     const newPost: Post = {
-      id: (+new Date()).toString(),
       title,
       shortDescription,
       content,
       bloggerId,
       bloggerName: blogger.name,
       createdAt: new Date().toISOString(),
-      extendedLikesInfo: {
-        likesCount: 0,
-        dislikesCount: 0,
-        myStatus: 'None',
-        newestLikes: [],
-      } as ExtendedLikesInfo,
+      likesCount: 0,
+      dislikesCount: 0,
+      myStatus: 'None',
     } as Post;
 
     return this.postsRepository.createPost(newPost);
@@ -97,14 +95,13 @@ export class PostsService {
     return this.postsRepository.deletePost(id);
   }
 
-
   // React on post ======================================================================================================================
   async reactOnPost(
     id: string,
     likeStatusDto: LikeStatusDto,
     currentUserData: any,
   ) {
-  debugger
+ 
     const { likeStatus } = likeStatusDto;
 
     let post = await this.postsRepository.getPostForReact(id);
@@ -126,15 +123,12 @@ export class PostsService {
       return this.postsRepository.reactOnPost(reaction, post);
     }
 
-
     // If user has reacted before
-    
 
     return this.postsRepository.reactOnPostAgain(
       currentUserPostReaction,
       post,
       likeStatus,
     );
-    
   }
 }

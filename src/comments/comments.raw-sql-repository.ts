@@ -3,17 +3,17 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+
 import { UpdateCommentDto } from './dto/update-comment.dto';
-import { Comment } from '../schemas/comment.schema';
+
 import { FilterDto } from '../dto/filter.dto';
 import { CustomResponseType } from '../types';
-import { ReactionsRepository } from '../likes/reactions.repository';
-import { CommentReaction } from 'src/schemas/comment-reaction.schema';
+
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { ReactionsRawSqlRepository } from '../likes/reactions.raw-sql-repository';
+import { CommentReaction } from '../likes/entities/comment-reaction.entity';
+import { Comment } from './comment.entity';
 
 @Injectable()
 export class CommentsRawSqlRepository {
@@ -51,7 +51,7 @@ export class CommentsRawSqlRepository {
 
   async getCommentById(id: string, userInfo?: any): Promise<Comment> {
     debugger;
-    let comment = await this.dataSource.query(
+    let comment: Comment = await this.dataSource.query(
       `
     SELECT c.*, u."userName" as "userLogin"
     FROM public."Comments" as c
@@ -61,7 +61,8 @@ export class CommentsRawSqlRepository {
     `,
       [id],
     );
-    if (comment.length === 0) throw new NotFoundException();
+    
+    if (Array.isArray(comment) && comment.length === 0) throw new NotFoundException();
     let mappedComment = this.commentMapper(comment[0]);
     let userCommentReaction: any;
     if (userInfo) {
@@ -75,7 +76,7 @@ export class CommentsRawSqlRepository {
     if (userCommentReaction)
       mappedComment.likesInfo.myStatus = userCommentReaction.likeStatus;
 
-    return mappedComment as Comment;
+    return mappedComment as any;
   }
 
   async createComment(newComment: any): Promise<Comment> {

@@ -8,9 +8,6 @@ import {
 } from 'class-validator';
 
 export class CreateBloggerDto {
-  @IsOptional()
-  id: string;
-
   @IsNotEmpty()
   @Length(1, 15)
   name: string;
@@ -19,4 +16,5 @@ export class CreateBloggerDto {
   @MaxLength(100)
   @Matches(/^https:\/\/([\w-]+\.)+[\w-]+(\/[\w-]+)*\/?$/)
   youtubeUrl: string;
+ 
 }

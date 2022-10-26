@@ -27,7 +27,7 @@ export class CommentsService {
     id: string,
     createCommentDto: CreateCommentDto,
     currentUserData: any,
-  ): Promise<Comment> {
+  ): Promise<any> {
     const { content } = createCommentDto;
     const newComment = {
       id: (+new Date()).toString(),
