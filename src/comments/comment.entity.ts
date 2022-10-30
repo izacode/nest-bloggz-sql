@@ -3,7 +3,7 @@ import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Post } from '../posts/post.entity';
 
 @Entity()
-export class Comment extends Document {
+export class Comment {
   @PrimaryGeneratedColumn('uuid')
   id: string;
   @Column()

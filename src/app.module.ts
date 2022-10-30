@@ -30,6 +30,11 @@ import { CommentsRawSqlRepository } from './comments/comments.raw-sql-repository
 import { BloggersService } from './bloggers/bloggers.service';
 import { BloggersRawSqlRepository } from './bloggers/bloggers.raw-sql-repository';
 import { TestingClearService } from './testing/testing-clear.service';
+import { Comment } from './comments/comment.entity';
+import { Post } from './posts/post.entity';
+import { Blogger } from './bloggers/blogger.entity';
+
+console.log(__dirname);
 
 @Module({
   imports: [
@@ -42,8 +47,19 @@ import { TestingClearService } from './testing/testing-clear.service';
       username: 'postgres',
       password: 'farce',
       database: 'Blog',
+      // entities: [Blogger, Post, Comment],
+      // entities: ['dist/**/*.entity{.ts,.js}'],
+      entities: [__dirname + '**/*.entity{.ts,.js}'],
+      // entities: [
+      //   'C:/Users/Sergiy/Desktop/nest-bloggz-typeOrmRaw/nest-bloggz-type-orm/dist/src/**/*.entity{.ts,.js}',
+      // ],
+      // entities: [
+      //   'C:/Users/Sergiy/Desktop/nest-bloggz-typeOrmRaw/nest-bloggz-type-orm/dist/**/*.entity{.ts,.js}',
+      // ],
       autoLoadEntities: false,
-      synchronize: false,
+      // autoLoadEntities: true,
+      // synchronize: false,
+      synchronize: true,
     }),
     // TypeOrmModule.forRoot({
     //   type: 'postgres',

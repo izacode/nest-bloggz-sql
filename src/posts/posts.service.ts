@@ -18,11 +18,13 @@ import { BloggersRawSqlRepository } from '../bloggers/bloggers.raw-sql-repositor
 import { Post } from './post.entity';
 import { Blogger } from 'src/bloggers/blogger.entity';
 import { PostReaction } from '../likes/entities/post-reaction.entity';
+import { PostsQbRepository } from './posts.qb-repository';
 
 @Injectable()
 export class PostsService {
   constructor(
-    private postsRepository: PostsRawSqlRepository,
+    // private postsRepository: PostsRawSqlRepository,
+    private postsRepository: PostsQbRepository,
     private bloggersRepository: BloggersRawSqlRepository,
     private jwtService: JwtService,
     private config: ConfigService,

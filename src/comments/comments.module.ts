@@ -11,7 +11,7 @@ import {
   CommentReaction,
   CommentReactionSchema,
 } from '../schemas/comment-reaction.schema';
-import { Comment, CommentSchema } from '../schemas/comment.schema';
+// import { Comment, CommentSchema } from '../schemas/comment.schema';
 import {
   PostReaction,
   PostReactionSchema,
@@ -19,13 +19,15 @@ import {
 import { Post, PostSchema } from '../schemas/post.schema';
 
 import { CommentsController } from './comments.controller';
-import { CommentsRepository } from './comments.repository';
+// import { CommentsRepository } from './comments.repository';
 import { CommentsService } from './comments.service';
 import { CommentsRawSqlRepository } from './comments.raw-sql-repository';
 import { ReactionsRawSqlRepository } from '../likes/reactions.raw-sql-repository';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Comment } from './comment.entity';
 
 @Module({
-  imports: [],
+  imports: [TypeOrmModule.forFeature([Comment])],
   controllers: [CommentsController],
   providers: [
     CommentsService,
@@ -33,17 +35,14 @@ import { ReactionsRawSqlRepository } from '../likes/reactions.raw-sql-repository
     ReactionsService,
     ReactionsRawSqlRepository,
     JwtService,
-  
   ],
   exports: [CommentsService, CommentsRawSqlRepository],
 })
 export class CommentsModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(LikeStatusValidationMiddleware)
-      .forRoutes({
-        path: 'comments/:id/like-status',
-        method: RequestMethod.PUT,
-      });
+    consumer.apply(LikeStatusValidationMiddleware).forRoutes({
+      path: 'comments/:id/like-status',
+      method: RequestMethod.PUT,
+    });
   }
 }

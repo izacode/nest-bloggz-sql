@@ -1,9 +1,9 @@
 import { Post } from '../posts/post.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 
 @Entity()
-export class Blogger {
+export class Blogger extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
   @Column()

@@ -4,11 +4,12 @@ import { CreateBloggerDto } from './dto/create-blogger.dto';
 import { FilterDto } from '../dto/filter.dto';
 import { UpdateBloggerDto } from './dto/update-blogger.dto';
 import { BloggersRawSqlRepository } from './bloggers.raw-sql-repository';
+import { BloggersQbRepository } from './bloggers.qb-repository';
 
 
 @Injectable()
 export class BloggersService {
-  constructor(protected bloggersRepository: BloggersRawSqlRepository) {}
+  constructor(protected bloggersRepository: BloggersQbRepository) {}
 
   async getBloggers(filterDto: FilterDto): Promise<CustomResponseType> {
     return this.bloggersRepository.getBloggers(filterDto);

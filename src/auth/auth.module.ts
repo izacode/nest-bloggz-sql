@@ -4,7 +4,7 @@ import { EmailAdapter } from '../emails/email.adapter';
 import { EmailManager } from '../emails/email.manager';
 import { EmailService } from '../emails/email.service';
 import { User, UserSchema } from '../schemas/user.schema';
-import { UsersRepository } from '../users/users.repository';
+// import { UsersRepository } from '../users/users.repository';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { ConfigService } from '@nestjs/config';

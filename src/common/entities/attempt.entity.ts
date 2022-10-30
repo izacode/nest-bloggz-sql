@@ -1,7 +1,7 @@
 import { Column, Entity } from 'typeorm';
 
 @Entity()
-export class Attempt extends Document {
+export class Attempt {
   @Column()
   ip: string;
   @Column()

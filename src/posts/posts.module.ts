@@ -2,9 +2,9 @@ import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { BloggersModule } from '../bloggers/bloggers.module';
 import { CommentsModule } from '../comments/comments.module';
-import { Blogger, BloggerSchema } from '../schemas/blogger.schema';
-import { Comment, CommentSchema } from '../schemas/comment.schema';
-import { Post, PostSchema } from '../schemas/post.schema';
+// import { Blogger, BloggerSchema } from '../schemas/blogger.schema';
+// import { Comment, CommentSchema } from '../schemas/comment.schema';
+// import { Post, PostSchema } from '../schemas/post.schema';
 import { PostsController } from './posts.controller';
 
 import { PostsService } from './posts.service';
@@ -23,20 +23,27 @@ import { ReactionsService } from '../likes/reactions.service';
 import { CredsValidationMiddleware } from '../middleware/creds-validation.middleware';
 import { PostsRawSqlRepository } from './posts.raw-sql-repository';
 import { ReactionsRawSqlRepository } from '../likes/reactions.raw-sql-repository';
+import { PostsQbRepository } from './posts.qb-repository';
+
+import { Blogger } from '../bloggers/blogger.entity';
+import { Comment } from '../comments/comment.entity';
+import { Post } from './post.entity';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 // forward ref to rewrite through helpers usecase
 
 @Module({
-  imports: [forwardRef(() => BloggersModule), CommentsModule],
+  imports: [forwardRef(() => BloggersModule), CommentsModule, TypeOrmModule.forFeature([Blogger, Post, Comment])],
   controllers: [PostsController],
   providers: [
     PostsService,
     PostsRawSqlRepository,
     JwtService,
     ReactionsRawSqlRepository,
+    PostsQbRepository,
     ReactionsService,
   ],
-  exports: [PostsService, PostsRawSqlRepository],
+  exports: [PostsService, PostsQbRepository, PostsRawSqlRepository],
 })
 export class PostsModule {
   // configure(consumer: MiddlewareConsumer) {
