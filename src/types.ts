@@ -1,7 +1,8 @@
-import { Blogger } from './schemas/blogger.schema';
-import { Post } from './schemas/post.schema';
-import { Comment } from './schemas/comment.schema';
-import { User } from './schemas/user.schema';
+import { Blogger } from "./bloggers/blogger.entity";
+import { Post } from "./posts/post.entity";
+import { User } from "./users/user.entity";
+import { Comment } from "./comments/comment.entity";
+
 
 
 
